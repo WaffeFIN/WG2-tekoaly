@@ -1,6 +1,6 @@
 # Viikkoraportti 1, 23.5.2016
 
-Raportti on vähän lyhkänen, kun ei kovinkaan paljon ole projektia aloittanut.
+Raportti on vähän lyhkänen, kun ei kovinkaan paljon ole projektia aloittanut. Aikaa käytetty 2 tuntia.
 
 #### Mitä olen tehnyt tällä viikolla?
 
