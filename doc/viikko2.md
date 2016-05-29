@@ -1,12 +1,12 @@
 # Viikkoraportti 2, 29.5.2016
 
-Aikaa käytetty 12 tuntia.
+Aikaa käytetty 15 tuntia.
 
 #### Mitä olen tehnyt tällä viikolla? / Miten ohjelma on edistynyt?
 
-Importtasin vanhoja luokkia ohjelmointi projektistani. Huomasin heti ongelmia tekoälyn implementoinnissa (vaikka se oli mielessä ohjelmoidessani ohjelmaa), joten suurin osa ajasta meni vanhojen luokkien korjaamiseen.  Koska kyseessä on oma peli jota parantelen jatkuvasti, piti myös päivittää vanhat säännöt uusiksi. Isoin ongelma tuli kuitenkin vastaan kun ongelma ei kerta kaikkiaan toiminnut tekstikäyttöliittymän kanssa, joten joudun luultavasti luomaan uuden sellaisen (sitten joskus).
+Importtasin vanhoja luokkia ohjelmointi projektistani. Huomasin heti ongelmia tekoälyn implementoinnissa (vaikka se oli mielessä ohjelmoidessani ohjelmaa), joten suuri osa ajasta meni vanhojen luokkien korjaamiseen.  Koska kyseessä on oma peli, jota parantelen jatkuvasti, piti myös päivittää vanhat säännöt uusiksi. Isoin ongelma tuli kuitenkin vastaan kun ohjelma ei kerta kaikkiaan toiminnut tekstikäyttöliittymän kanssa, joten joudun luultavasti luomaan uuden sellaisen (sitten myöhemmin).
 
-Lopuksi lisäsin dokumentaatiota. Testejä en ole vielä luonnut, sillä ei vielä ole mitään testattavaa (lukuunottamatta importatut luokat)
+Lopuksi lisäsin dokumentaatiota. Testejä en ole vielä luonnut, sillä ei ole mitään testattavaa (lukuunottamatta importatut luokat)
 
 #### Mitä opin tällä viikolla / tänään?
 
@@ -18,7 +18,7 @@ Lopuksi lisäsin dokumentaatiota. Testejä en ole vielä luonnut, sillä ei viel
 
 #### Mikä jäi epäselväksi tai tuottanut vaikeuksia?
 
-Korttikombinaatioiden laskeminen tuottaa luultavasti kovaa hidastumista. Yritän pähkäillä nopeita metodeja minimoida kokeiluja.
+Korttikombinaatioiden laskeminen tuottaa luultavasti kovaa hidastumista. Lisäksi on vaikeaa yrittää vähentää muistivaatimusta uhraamatta laskunopeutta. Yritän pähkäillä nopeita metodeja minimoida validien kombinaatioiden kokeilujen määrää.
 
 Kysymys: Jos importtaan luokkia, tulen varmaan myös testaa niitä uudelleen? Voin varmaan importata vanhat testitkin, jos näin on
 

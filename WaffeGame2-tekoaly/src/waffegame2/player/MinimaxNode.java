@@ -5,9 +5,8 @@
  */
 package waffegame2.player;
 
-import java.util.List;
-
 /**
+ * The nodes used by MinimaxTrees
  *
  * @author Walter
  */

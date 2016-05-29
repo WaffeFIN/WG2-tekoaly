@@ -6,37 +6,45 @@
 package waffegame2.player;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.PileType;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 
 /**
+ * The minimax tree data structure used by the AI to determine winning endgame
+ * positions.
  *
  * @author Walter
  */
-public class MinimaxTreeWaffeGame2 {
+public class MinimaxTreeWaffeGame2 extends MinimaxTree {
 
     private final PileRuleWaffeGame2 prwg2;
 
     private final List<Card> c1;
     private final List<Card> c2;
-
-    MinimaxNode root;
+    private final Map<Card, Integer> ic1;
+    private final Map<Card, Integer> ic2;
 
     public MinimaxTreeWaffeGame2(PileRuleWaffeGame2 prwg2, List<Card> c1, List<Card> c2) {
         this.prwg2 = prwg2;
         this.c1 = c1;
         this.c2 = c2;
+        this.ic1 = inverseMap(c1);
+        this.ic2 = inverseMap(c1);
     }
 
-    /**
-     * Finds a card combination that guarantees a win.
-     *
-     * @return
-     */
+    private Map<Card, Integer> inverseMap(List<Card> cards) {
+        Map<Card, Integer> rv = new HashMap();
+        for (int i = 0; i < cards.size(); i++) {
+            rv.put(cards.get(i), i);
+        }
+        return rv;
+    }
+
+    @Override
     public List<List<Card>> findWinningLine() {
         long initialState = (1 << (c1.size() + c2.size())) - 1;
         root = new MinimaxNode(0, initialState);
@@ -66,8 +74,8 @@ public class MinimaxTreeWaffeGame2 {
 
         //first parent node state -> list of playable cards
         //tableState -> list of cards -> pileType?
-        Set<Card> playableCards;
-        Set<Card> opponentsCards;
+        List<Card> playableCards;
+        List<Card> opponentsCards;
         if (node.depth % 2 == 0) {
             playableCards = getCards(s1);
             opponentsCards = getCards(s2);
@@ -75,9 +83,9 @@ public class MinimaxTreeWaffeGame2 {
             playableCards = getCards(s2);
             opponentsCards = getCards(s1);
         }
-        Set<Card> tableCards;
+        List<Card> tableCards;
         if (tableState == 0l) {
-            tableCards = new HashSet();
+            tableCards = new ArrayList();
         } else {
             tableCards = getCards(tableState);
         }
@@ -97,8 +105,8 @@ public class MinimaxTreeWaffeGame2 {
         }
     }
 
-    private Set<Card> getCards(long state) {
-        Set<Card> rv = new HashSet(c1.size() + c2.size());
+    private List<Card> getCards(long state) {
+        List<Card> rv = new ArrayList(c1.size() + c2.size());
         for (int i = 0; i < c1.size() + c2.size(); i++) {
             //check LSB
             if ((state & 1) == 0) {
@@ -113,49 +121,44 @@ public class MinimaxTreeWaffeGame2 {
         return rv;
     }
 
-    private int createChildNodes(int depth, Set<Card> playableCards, Set<Card> opponentsCards, Set<Card> tableCards) {
+//    private class SuitCombination {
+//        Card.Suit suit;
+//        Set<Card> cards;
+//        boolean enabled;
+//
+//        public Combination(Set<Card> cards) {
+//            this.cards = cards;
+//            this.enabled = true;
+//        }
+//    }
+    private int createChildNodes(int depth, List<Card> playableCards, List<Card> opponentsCards, List<Card> tableCards) {
+        List<List<Card>> C;
+
+        //combinations can increase! if both hands' combinations are calculated, they can only decrease!
+        //Suits can be treated separately
+        //When trying striaght or group, prioritize isolated cards
+        //
         //check all playable combinations depending on table state
-        //COMBINATION CHECK HAS TO BE EFFICIENT
-        PileType type = prwg2.checkType(new ArrayList(tableCards));
-        
-        for (Card card : playableCards) {
+        if (tableCards.isEmpty()) {
+            //isolate smallest 2 suits
+            //get biggest C with them
+            //afterwards:
+            //Piletype order, largest C first
+        } else {
+            //jokers should be avoided
+            PileType type = prwg2.checkType(new ArrayList(tableCards));
+            //Piletype order, largest C first
+        }
+
+        for (List<Card> cards : C) {
             recursiveTreeGeneration(new MinimaxNode(depth, cardsState), tableState);
         }
-        //info:
-        //int[] -> {clubs, diamonds, hearts, spades, pairs, triples, quads}
-        //IN WHAT ORDER DO WE ADD COMBINATIONS TO BE CHECKED?
-        //if there's an empty table, check if you can place all cards
-        //if the table is suits, add a suit if the opponent has one. If the opponent doesn't have one add all of suit.
-        //if the table is (small) straight check start and end.
-        //if the straight <= pCards size check for pairs
-        //add suits two cards larger than opponents suits to C
-        //add each card alone to C
-        //create child nodes for each (combination -> long)
-        //recursively create next nodes for each child
-        
-        return 1;
-    }
 
-    private long getState(Set<Card> cards) {
-        long state = 0l;
-        for (int i = c1.size() + c2.size() - 1; i >= 0; i--) {
-            if (i >= c2.size()) {
-                if (cards.contains(c1.get(i - c2.size()))) {
-                    state++;
-                }
-            } else {
-                if (cards.contains(c2.get(i))) {
-                    state++;
-                }
-            }
-            state = state << 1;
-        }
-        return state;
+        return 1;
     }
 
     private void createNode(MinimaxNode parent, long state) {
         MinimaxNode node = new MinimaxNode(parent.depth++, state);
         node.parent = parent;
     }
-
 }
