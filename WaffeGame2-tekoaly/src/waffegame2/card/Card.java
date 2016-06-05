@@ -34,6 +34,16 @@ public class Card {
         public int toInt() {
             return suit;
         }
+        
+        /**
+         * The method searches through all Suits and returns the highest
+         * integer value found (which is 4, the Spades)
+         *
+         * @return the highest integer value
+         */
+        public static int max() {
+            return 4;
+        }
 
         @Override
         public String toString() {
@@ -83,13 +93,7 @@ public class Card {
          * @return the highest integer value
          */
         public static int max() {
-            int max = Integer.MIN_VALUE;
-            for (Value value : Value.values()) {
-                if (value.toInt() > max) {
-                    max = value.toInt();
-                }
-            }
-            return max;
+            return 13;
         }
 
         @Override

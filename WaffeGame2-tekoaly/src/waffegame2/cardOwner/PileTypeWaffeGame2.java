@@ -14,14 +14,75 @@ package waffegame2.cardOwner;
  */
 public enum PileTypeWaffeGame2 implements PileType {
 
-    NULL, OPEN, CLUBS, DIAMONDS, HEARTS, SPADES, STRAIGHT, PERFECTSTRAIGHT, PAIRS, TRIPLES, QUADRUPLES, LONGSTRAIGHT;
+    /**
+     * Null type, used for invalid pile configurations.
+     */
+    NULL(-1),
+    /**
+     * Open, only jokers have been placed and the type of the pile is still
+     * undetermined.
+     */
+    OPEN(0),
+    /**
+     * All cards are of clubs.
+     */
+    CLUBS(1),
+    /**
+     * All cards are of diamonds.
+     */
+    DIAMONDS(2),
+    /**
+     * All cards are of hearts.
+     */
+    HEARTS(3),
+    /**
+     * All cards are of spades.
+     */
+    SPADES(4),
+    /**
+     * All cards are in a straight. The straight doesn't overlap itself.
+     */
+    STRAIGHT(5),
+    /**
+     * All cards are in pairs.
+     */
+    PAIRS(6),
+    /**
+     * All cards are in triples.
+     */
+    TRIPLES(7),
+    /**
+     * All cards are in quadruples.
+     */
+    QUADRUPLES(8),
+    /**
+     * All cards are in a perfect straight. A perfect straight contains a number
+     * of cards divisible by 13.
+     */
+    PERFECTSTRAIGHT(9),
+    /**
+     * All cards are in an overlapping straight. This is the final type a pile
+     * can achieve.
+     */
+    LONGSTRAIGHT(10);
+
+    private final int type;
+
+    private PileTypeWaffeGame2(int type) {
+        this.type = type;
+    }
+
+    @Override
+    public int toInt() {
+        return type;
+    }
 
     @Override
     public String toString() {
         switch (this) {
             case NULL:
                 return "Open";
-            case OPEN: //only jokers
+            case OPEN: 
                 return "Open";
             case CLUBS:
                 return "Clubs";

@@ -19,6 +19,7 @@ import waffegame2.player.Player;
 public class Util {
 
     /**
+     * Returns whether a String is in an integer form.
      * @param str the string to check
      * @return true if str is an integer
      */
@@ -30,4 +31,13 @@ public class Util {
         }
         return true;
     }
+    /**
+     * Returns the square of the input double n.
+     * @param n
+     * @return n*n
+     */
+    public static double sqr(double n) {
+        return n*n;
+    }
+    
 }

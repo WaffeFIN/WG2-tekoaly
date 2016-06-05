@@ -2,9 +2,10 @@ package waffegame2.cardOwner.pileRules;
 
 import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.card.*;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import waffegame2.cardOwner.PileType;
 
 /**
@@ -22,18 +23,17 @@ public class PileRuleWaffeGame2 implements PileRule {
     private int maxGroup;
 
     @Override
-    public PileType checkType(List<Card> list) {
-        return updateType(null, list);
-    }
-
-    @Override
-    public PileType updateType(PileType currentType, List<Card> list) {
-        initCards(list);
-
-        if (njCards.isEmpty() && jokers == 0) {
-            return PileTypeWaffeGame2.NULL;
+    public PileType checkType(Collection<Card> c) {
+        initCards(c);
+        if (njCards.isEmpty()) {
+            if (jokers == 0) {
+                return PileTypeWaffeGame2.NULL;
+            } else {
+                return PileTypeWaffeGame2.OPEN;
+            }
         }
-        PileTypeWaffeGame2 s = getSuitType();
+        PileTypeWaffeGame2 s;
+        s = getSuitType();
         if (s != PileTypeWaffeGame2.NULL) {
             return s;
         }
@@ -41,18 +41,57 @@ public class PileRuleWaffeGame2 implements PileRule {
         if (s != PileTypeWaffeGame2.NULL) {
             return s;
         }
-        return getGroupType();
-
+        s = getGroupType();
+        return s;
     }
 
-    private void initCards(List<Card> list) {
+    @Override
+    public PileType updateType(PileType currentType, Collection<Card> c) {
+        initCards(c);
+        PileTypeWaffeGame2 s;
+        switch (currentType.toInt()) {
+            case -1:
+            case 0:
+                if (njCards.isEmpty()) {
+                    if (jokers == 0) {
+                        return PileTypeWaffeGame2.NULL;
+                    } else {
+                        return PileTypeWaffeGame2.OPEN;
+                    }
+                }
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                s = getSuitType();
+                if (s != PileTypeWaffeGame2.NULL) {
+                    return s;
+                }
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                s = getGroupType();
+                if (s != PileTypeWaffeGame2.NULL) {
+                    return s;
+                }
+            case 9:
+            case 10:
+                s = getStraightType();
+                return s;
+            default:
+                return PileTypeWaffeGame2.NULL;
+        }
+    }
+
+    private void initCards(Collection<Card> c) {
         njCards = new ArrayList();
         jokers = 0;
         groups = new int[Card.Value.max()];
         maxGroup = 0;
 
         int i;
-        for (Card card : list) {
+        for (Card card : c) {
             if (card.isJoker()) {
                 jokers++;
             } else {
@@ -64,7 +103,7 @@ public class PileRuleWaffeGame2 implements PileRule {
                 }
             }
         }
-        
+
         Collections.sort(njCards, new CardValueComparator());
     }
 

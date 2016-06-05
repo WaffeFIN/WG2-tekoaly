@@ -5,6 +5,11 @@
  */
 package waffegame2.player;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import waffegame2.card.Card;
+
 /**
  * The nodes used by MinimaxTrees
  *
@@ -16,24 +21,24 @@ public class MinimaxNode {
     int depth;
     MinimaxNode parent;
     MinimaxNode bestChild;
-    long state; //64 bits, 32+32
-    //List<MinimaxNode> children;
 
-    public MinimaxNode(int depth, long state) {
-        this.value = 0;
-        this.depth = depth;
-        this.state = state;
-        //this.children = new ArrayList();
-    }
+    HashSet<Card> maxCards;
+    HashSet<Card> minCards;
+    HashSet<Card> pileCards;
 
-    public MinimaxNode(int value, int depth, long state) {
+    List<MinimaxNode> children;
+
+    public MinimaxNode(int value, int depth, MinimaxNode parent, HashSet<Card> maxCards, HashSet<Card> minCards, HashSet<Card> pileCards) {
         this.value = value;
         this.depth = depth;
-        this.state = state;
-        //this.children = new ArrayList();
+        this.parent = parent;
+        this.maxCards = maxCards;
+        this.minCards = minCards;
+        this.pileCards = pileCards;
+        this.children = new ArrayList();
     }
 
-//    public boolean isLeaf() {
-//        return children.isEmpty();
-//    }
+    public boolean isMinNode() {
+        return (depth % 2 == 1);
+    }
 }

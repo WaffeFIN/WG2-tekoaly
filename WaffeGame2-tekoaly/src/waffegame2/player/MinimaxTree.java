@@ -5,11 +5,13 @@
  */
 package waffegame2.player;
 
+import java.util.Collection;
 import java.util.List;
 import waffegame2.card.Card;
 
 /**
  * An interface for all minimax trees used by AIs
+ *
  * @author Walter
  */
 public abstract class MinimaxTree {
@@ -17,9 +19,12 @@ public abstract class MinimaxTree {
     public MinimaxNode root;
 
     /**
-     * Finds a card combination that guarantees a win.
-     *
-     * @return a list containing all cards to be played on specific turns.
+     * Creates a minimax tree using alpha-beta pruning
+     * @param cards
+     * @param opponentsCards
+     * @param pileCards
      */
-    abstract public List<List<Card>> findWinningLine();
+    abstract public void generateTree(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
+
+    abstract public List<Card> getBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
 }

@@ -10,5 +10,6 @@ package waffegame2.cardOwner;
  * @author Walter
  */
 public interface PileType {
-    
+
+    public int toInt();
 }

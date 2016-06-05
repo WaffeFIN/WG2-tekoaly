@@ -5,8 +5,8 @@
  */
 package waffegame2.cardOwner.pileRules;
 
+import java.util.Collection;
 import waffegame2.card.Card;
-import java.util.List;
 import waffegame2.cardOwner.PileType;
 
 /**
@@ -18,7 +18,7 @@ import waffegame2.cardOwner.PileType;
  */
 public interface PileRule {
 
-    public PileType checkType(List<Card> list);
+    public PileType checkType(Collection<Card> c);
 
-    public PileType updateType(PileType currentType, List<Card> list);
+    public PileType updateType(PileType currentType, Collection<Card> c);
 }
