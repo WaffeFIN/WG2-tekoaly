@@ -23,6 +23,11 @@ public class PileRuleWaffeGame2 implements PileRule {
     private int maxGroup;
 
     @Override
+    public PileType nullType() {
+        return PileTypeWaffeGame2.NULL; //:D
+    }
+
+    @Override
     public PileType checkType(Collection<Card> c) {
         initCards(c);
         if (njCards.isEmpty()) {
@@ -224,4 +229,5 @@ public class PileRuleWaffeGame2 implements PileRule {
         }
         return PileTypeWaffeGame2.NULL;
     }
+
 }

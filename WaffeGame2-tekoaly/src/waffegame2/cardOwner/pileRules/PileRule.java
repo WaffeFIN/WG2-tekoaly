@@ -18,7 +18,10 @@ import waffegame2.cardOwner.PileType;
  */
 public interface PileRule {
 
+    public PileType nullType();
+
     public PileType checkType(Collection<Card> c);
 
     public PileType updateType(PileType currentType, Collection<Card> c);
+
 }

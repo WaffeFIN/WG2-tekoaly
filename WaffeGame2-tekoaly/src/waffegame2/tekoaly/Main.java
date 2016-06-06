@@ -27,6 +27,7 @@ public class Main {
     static List<Card> othersCards;
 
     public static void main(String[] args) {
+        MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2);
         myCards = new ArrayList();
         myCards.add(new Card(Card.Value.QUEEN, Card.Suit.SPADES));
         myCards.add(new Card(Card.Value.EIGHT, Card.Suit.HEARTS));
@@ -36,18 +37,10 @@ public class Main {
         othersCards.add(new Card(Card.Value.TEN, Card.Suit.SPADES));
         othersCards.add(new Card(Card.Value.NINE, Card.Suit.HEARTS));
         othersCards.add(new Card(Card.Value.FOUR, Card.Suit.DIAMONDS));
-        printListList(getWinningLine(true));
+        
+        tree.generateTree(myCards, othersCards, null);
+        //printListList(getWinningLine(true));
 
     }
 
-    public static List<List<Card>> getWinningLine(boolean forMe) {
-        MinimaxTreeWaffeGame2 tree;
-        if (forMe) {
-            tree = new MinimaxTreeWaffeGame2(prwg2, myCards, othersCards);
-        } else {
-            tree = new MinimaxTreeWaffeGame2(prwg2, othersCards, myCards);
-        }
-        return tree.generateTree();
-    }
-    
 }

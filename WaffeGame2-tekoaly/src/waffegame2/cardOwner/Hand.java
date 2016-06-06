@@ -9,7 +9,6 @@ import waffegame2.card.CardSuitComparator;
 import waffegame2.card.Card;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.logging.Logger;
 import waffegame2.player.Player;
 
 /**
@@ -82,7 +81,7 @@ public class Hand extends CardOwner {
 
         @Override
         public String toString() {
-            switch(this) {
+            switch (this) {
                 case HIDDEN:
                     return "Hidden";
                 case PRIVATE:
@@ -93,8 +92,7 @@ public class Hand extends CardOwner {
                     return "Public";
             }
         }
-        
-        
+
     }
 
     private Player player;
@@ -118,7 +116,11 @@ public class Hand extends CardOwner {
 
     @Override
     public String getName() {
-        return getPlayer().getName() + "'s " + getAccessibility().toString() + " hand";
+        if (getPlayer() == null) {
+            return getAccessibility().toString() + " hand";
+        } else {
+            return getPlayer().getName() + "'s " + getAccessibility().toString() + " hand";
+        }
     }
 
     public Player getPlayer() {

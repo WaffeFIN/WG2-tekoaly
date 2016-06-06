@@ -23,12 +23,12 @@ import waffegame2.card.CardSuitComparator;
  */
 public class Pile extends CardOwner {
 
-    private PileType type;
     private PileRule rule;
+    private PileType type;
 
     public Pile(PileRule rule) {
-        this.type = null;
         this.rule = rule;
+        this.type = rule.nullType();
     }
 
     @Override

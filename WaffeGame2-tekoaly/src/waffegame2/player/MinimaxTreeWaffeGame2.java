@@ -16,6 +16,7 @@ import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 import waffegame2.util.Util;
 
 /**
+ * The minimax tree data structure used by the AI to score endgame positions.
  *
  * @author Walter
  */
@@ -25,26 +26,53 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     private int calculations;
     private final int calculationLimit = 10000;
 
+    /**
+     *
+     * @param prwg2 the PileRule entity used to determine valid configurations
+     */
     public MinimaxTreeWaffeGame2(PileRuleWaffeGame2 prwg2) {
         this.prwg2 = prwg2;
 
     }
 
+    /**
+     * Creates a new minimax tree data structure used by the AI to score endgame
+     * positions.
+     *
+     * @param cards The card collection associated to you
+     * @param opponentsCards The card collection associated to the opponent
+     * @param pile The card collection associated to the pile. If left as null
+     * the pile is considered empty
+     */
     @Override
-    public void generateTree(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
+    public void generateTree(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pile) {
         calculations = 0;
-        root = new MinimaxNode(0, 0, null, new HashSet(cards), new HashSet(opponentsCards), new HashSet(pileCards));
+        HashSet<Card> pileCards;
+        if (pile == null) {
+            pileCards = new HashSet();
+        } else {
+            pileCards = new HashSet(pile);
+        }
+        root = new MinimaxNode(0, 0, null, new HashSet(cards), new HashSet(opponentsCards), pileCards);
         root.value = minimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    /**
+     * The main minimax algorithm
+     *
+     * @param node the current node
+     * @param a alpha value
+     * @param b beta value
+     * @return the score of the node
+     */
     private int minimax(MinimaxNode node, int a, int b) {
         calculations++;
 
-        int win = checkForWin(node);
-        if (win != 0) {
-            return win;
+        int winScore = checkForWin(node);
+        if (winScore != 0) {
+            return winScore;
         }
-        if (node.depth * calculations > calculationLimit) {//return the estimated score of this leaf
+        if (node.depth * calculations > calculationLimit) {
             return scoreEstimate(node);
         } else {
             int alpha = a;
@@ -82,6 +110,15 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         }
     }
 
+    /**
+     * Finds the best move for the input position.
+     *
+     * @param cards the cards of who goes first
+     * @param opponentsCards the cards of the responder
+     * @param pileCards the cards in the pile
+     * @return A list containing the best move to be played by whoever holds the
+     * 'cards'
+     */
     @Override
     public List<Card> getBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
         MinimaxNode node = findNode(root, new HashSet(cards), new HashSet(opponentsCards), new HashSet(pileCards));
@@ -99,13 +136,21 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         }
     }
 
+    /**
+     * Finds the node with the inputted game state
+     */
     private MinimaxNode findNode(MinimaxNode node, HashSet<Card> maxCards, HashSet<Card> minCards, HashSet<Card> pileCards) {
         //find move by navigating tree:
-        
+
         //if move isn't found, generateTree
         return null; //:D
     }
 
+    /**
+     * Creates a list of every single (or most of the) playable combination
+     *
+     * @param node the parent node
+     */
     private List<MinimaxNode> createSuccessors(MinimaxNode node) {
         HashSet<Card> cards;
         if (node.isMinNode()) {
@@ -121,9 +166,12 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         switch (pileType.toInt()) {
             case -1:
             case 0:
-                addAllStraights(rv, cards, true);
-                addAllGroups(rv, cards);
-                addAllSuitCombos(rv, cards, 0);
+                if (cards.size() > 2) {
+                    addAllStraights(rv, cards, true);
+                    addAllSuitCombos(rv, cards, 0);
+                    addAllGroups(rv, cards);
+                }
+                addAllSingles(rv, cards);
                 break;
             case 1:
             case 2:
@@ -142,7 +190,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             case 7:
                 checkGrouping(rv, cards, pileCards, 4);
             case 8:
-                continueGroups(rv, cards, pileType.toInt() - 4);
+                continueGroups(rv, cards, pileCards, pileType.toInt() - 4);
                 break;
             case 9:
                 addAllStraights(rv, cards, false);
@@ -171,7 +219,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
 
     private void addAllGroups(List<MinimaxNode> rv, Collection<Card> cards) {
         for (int i = 2; i <= 4; i++) {
-            continueGroups(rv, cards, i);
+            continueGroups(rv, cards, null, i);
         }
     }
 
@@ -204,7 +252,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         return false; //:D
     }
 
-    private void continueGroups(List<MinimaxNode> rv, Collection<Card> cards, int groupSize) {
+    private void continueGroups(List<MinimaxNode> rv, Collection<Card> cards, Collection<Card> pileCards, int groupSize) {
 
     }
 
@@ -246,6 +294,9 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         }
     }
 
+    /**
+     * Estimates the score judging by hand size
+     */
     private int scoreEstimate(MinimaxNode node) {
         HashSet<Card> cards;
         HashSet<Card> oCards;
@@ -262,14 +313,28 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         } else {
             sgn = 1.0;
         }
+        int cardsPoints = cards.size() + 3 * countJokers(cards);
+        int oCardsPoints = oCards.size() + 3 * countJokers(oCards);
         PileType oType = prwg2.checkType(oCards);
-        if (oType == PileTypeWaffeGame2.CLUBS || oType == PileTypeWaffeGame2.DIAMONDS || oType == PileTypeWaffeGame2.HEARTS || oType == PileTypeWaffeGame2.SPADES) {
-            return (int) (sgn * 750 * ((double) cards.size() / (oCards.size() - 0.5) - 1.0));
+        if (oCardsPoints == 4 * oCards.size()) {
+            if (node.isMinNode()) {
+                return Integer.MAX_VALUE;
+            } else {
+                return Integer.MIN_VALUE;
+            }
+        } else if (oCards.size() == 1) {
+            return 7 * cards.size() - 9;
+        } else if (oType == PileTypeWaffeGame2.CLUBS || oType == PileTypeWaffeGame2.DIAMONDS || oType == PileTypeWaffeGame2.HEARTS || oType == PileTypeWaffeGame2.SPADES) {
+            return (int) (sgn * 7 * ((double) cardsPoints / (oCardsPoints - 0.5) - 1.0));
         } else {
-            return (int) (sgn * 2100 * (1.0 / Util.sqr(oCards.size() - 0.5) - 1.0 / Util.sqr(cards.size())));
+            return (int) (sgn * 24 * (1.0 / Util.sqr(oCardsPoints - 0.5) - 1.0 / Util.sqr(cardsPoints)));
         }
     }
 
+    /**
+     * Returns Integer.MIN_VALUE if a min node has won, or Integer.MAX_VALUE if
+     * a max node has won
+     */
     private int checkForWin(MinimaxNode node) {
         HashSet<Card> play = new HashSet(node.pileCards);
         if (node.isMinNode()) {
@@ -285,5 +350,11 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             }
         }
         return 0;
+    }
+
+    private int countJokers(HashSet<Card> cards) {
+        int rv = 0;
+        rv = cards.stream().filter((card) -> (card.isJoker())).map((_item) -> 1).reduce(rv, Integer::sum);
+        return rv;
     }
 }
