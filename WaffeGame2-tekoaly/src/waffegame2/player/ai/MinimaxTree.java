@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package waffegame2.player;
+package waffegame2.player.ai;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,4 +27,6 @@ public abstract class MinimaxTree {
     abstract public void generateTree(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
 
     abstract public List<Card> getBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
+    
+    abstract public int estimateScore(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
 }

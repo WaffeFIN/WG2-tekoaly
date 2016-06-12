@@ -11,7 +11,7 @@ import java.util.List;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.*;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
-import waffegame2.player.MinimaxTreeWaffeGame2;
+import waffegame2.player.ai.MinimaxTreeWaffeGame2;
 
 /**
  *
