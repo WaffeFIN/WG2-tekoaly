@@ -17,37 +17,37 @@ public class WaffeMap<K, V> implements Map<K, V>{
 
     @Override
     public int size() {
-        return; //:D
+        return 0; //:D
     }
 
     @Override
     public boolean isEmpty() {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public V get(Object key) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public V put(K key, V value) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public V remove(Object key) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
@@ -62,17 +62,17 @@ public class WaffeMap<K, V> implements Map<K, V>{
 
     @Override
     public Set<K> keySet() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public Collection<V> values() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
-        return; //:D
+        return null; //:D
     }
 
     

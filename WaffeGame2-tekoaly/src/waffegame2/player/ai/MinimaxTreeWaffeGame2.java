@@ -54,6 +54,9 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     @Override
     public void generateTree(Collection<Card> maxCards, Collection<Card> minCards, Collection<Card> pile) {
+        if (pile == null) {
+            pile = new HashSet();
+        }
         calculations = 0;
         nodeMap.clear();
         initStateConverter(maxCards, minCards, pile);
@@ -95,7 +98,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     private int minimax(MinimaxNode node, int a, int b) {
         calculations++;
-
+        
         if (checkForWin(node)) {
             if (node.isMinNode()) {
                 return Integer.MIN_VALUE;
@@ -227,6 +230,9 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     @Override
     public List<Card> getBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
+        if (pileCards == null) {
+            pileCards = new HashSet();
+        }
         MinimaxNode node = findNode(cards, opponentsCards, pileCards);
         if (node == null) {
             generateTree(cards, opponentsCards, pileCards);
@@ -273,7 +279,8 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
 
     /**
      * YET TO BE IMPLEMENTED
-     * @param node 
+     *
+     * @param node
      */
     private void continueMinimax(MinimaxNode node) {
         //fix parent values! recursively?
@@ -309,9 +316,17 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
 
     /**
      * Estimates the score judging by hand size and pile type
+     *
+     * @param cards
+     * @param opponentsCards
+     * @param pileCards
+     * @return
      */
     @Override
     public int estimateScore(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
+        if (pileCards == null) {
+            pileCards = new HashSet();
+        }
 
         double K = cards.size() + 3 * countJokers(cards);
         double k = opponentsCards.size() + 3 * countJokers(opponentsCards);

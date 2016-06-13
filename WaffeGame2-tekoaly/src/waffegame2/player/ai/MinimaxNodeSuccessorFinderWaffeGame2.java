@@ -47,7 +47,7 @@ public class MinimaxNodeSuccessorFinderWaffeGame2 {
             case 0:
                 if (cards.size() >= 2) {
                     addAllStraights(node, rv, cards, cardsValues, true);
-                    addAllGroups(node, rv, cards, cardsValues);
+                    addAllGroups(node, rv, cards, cardsValues, pileCards, pileValues);
                     addAllSuitCombos(node, rv, cards, 0);
                 }
                 addAllSingles(node, rv, cards);
@@ -119,9 +119,9 @@ public class MinimaxNodeSuccessorFinderWaffeGame2 {
         //use the 
     }
 
-    private static void addAllGroups(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues) {
+    private static void addAllGroups(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues) {
         for (int i = 2; i <= 4; i++) {
-            continueGroups(node, rv, cards, cardsValues, null, null, i);
+            continueGroups(node, rv, cards, cardsValues, pileCards, pileValues, i);
         }
     }
 
@@ -160,10 +160,11 @@ public class MinimaxNodeSuccessorFinderWaffeGame2 {
 
     private static void addAllSuitPermutations(MinimaxNode node, List<MinimaxNode> rv, List<Card> cardsOfSuit) {
         //this comes last, so add all until rv.size > max
-        
+
     }
 
     private static void addAllSingles(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards) {
+
         for (Card card : cards) {
             Collection<Card> play = new HashSet();
             play.add(card);
@@ -217,7 +218,7 @@ public class MinimaxNodeSuccessorFinderWaffeGame2 {
             Collection<Card> newCards = new HashSet(cards);
             Collection<Card> newPileCards = new HashSet(pileCards);
             transferCards(transformCards, newCards, newPileCards);
-            
+
             List<Card>[] newCardsValues = getValueListArray(newCards);
             List<Card>[] newPileCardsValues = getValueListArray(newPileCards);
 
@@ -266,7 +267,11 @@ public class MinimaxNodeSuccessorFinderWaffeGame2 {
             pileCards = new HashSet();
         } else {
             pileCards = new HashSet(parent.pileCards);
-            transferCards(play, parent.getNodePlayingCards(), pileCards);
+            if (parent.isMinNode()) {
+                transferCards(play, minCards, pileCards);
+            } else {
+                transferCards(play, maxCards, pileCards);
+            }
         }
         MinimaxNode rv = new MinimaxNode(0, parent.depth + 1, maxCards, minCards, pileCards);
         parent.children.add(rv);

@@ -17,62 +17,62 @@ public class WaffeSet<E> implements Set<E>{
 
     @Override
     public int size() {
-        return; //:D
+        return 0; //:D
     }
 
     @Override
     public boolean isEmpty() {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean contains(Object o) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public Iterator<E> iterator() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public Object[] toArray() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public boolean add(E e) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean remove(Object o) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override

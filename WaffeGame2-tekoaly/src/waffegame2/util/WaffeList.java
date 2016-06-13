@@ -19,67 +19,67 @@ public class WaffeList<E> implements List<E>{
 
     @Override
     public int size() {
-        return; //:D
+        return 0; //:D
     }
 
     @Override
     public boolean isEmpty() {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean contains(Object o) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public Iterator<E> iterator() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public Object[] toArray() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public boolean add(E e) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean remove(Object o) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return; //:D
+        return false; //:D
     }
 
     @Override
@@ -89,12 +89,12 @@ public class WaffeList<E> implements List<E>{
 
     @Override
     public E get(int index) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public E set(int index, E element) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
@@ -104,32 +104,32 @@ public class WaffeList<E> implements List<E>{
 
     @Override
     public E remove(int index) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public int indexOf(Object o) {
-        return; //:D
+        return 0; //:D
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return; //:D
+        return 0; //:D
     }
 
     @Override
     public ListIterator<E> listIterator() {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public ListIterator<E> listIterator(int index) {
-        return; //:D
+        return null; //:D
     }
 
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
-        return; //:D
+        return null; //:D
     }
 
     
