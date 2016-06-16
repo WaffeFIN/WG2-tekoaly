@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.PileType;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
@@ -28,10 +30,12 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     private final PileRuleWaffeGame2 prwg2;
 
     private int calculations;
-    private final int calculationLimit = 2000;
+    private int nodeMapDuplicates;
+    private int nodeClones;
+    private final int calculationLimit = 1000000;
 
-    private Map<Long, MinimaxNode> nodeMap;
-    private Map<Card, Long> stateConverter;
+    private final Map<Long, MinimaxNode> nodeMap;
+    private final Map<Card, Long> stateConverter;
     private int pileCardStateShifter;
 
     /**
@@ -41,6 +45,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     public MinimaxTreeWaffeGame2(PileRuleWaffeGame2 prwg2) {
         this.prwg2 = prwg2;
         this.nodeMap = new HashMap();
+        this.stateConverter = new HashMap(64);
     }
 
     /**
@@ -54,24 +59,41 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     @Override
     public void generateTree(Collection<Card> maxCards, Collection<Card> minCards, Collection<Card> pile) {
-        if (pile == null) {
-            pile = new HashSet();
+        if (maxCards.size() + minCards.size() > 32) {
+            try {
+                throw new Exception("Too many cards for tree generation!");
+            } catch (Exception ex) {
+                Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        calculations = 0;
-        nodeMap.clear();
-        initStateConverter(maxCards, minCards, pile);
         HashSet<Card> pileCards;
         if (pile == null) {
             pileCards = new HashSet();
         } else {
             pileCards = new HashSet(pile);
         }
+        
+        calculations = 0;
+        nodeClones = 0;
+        nodeMapDuplicates = 0;
+        nodeMap.clear();
+        
+        initStateConverter(maxCards, minCards, pileCards);
+
+        System.out.println("Generating tree...");
+
         root = new MinimaxNode(0, 0, new HashSet(maxCards), new HashSet(minCards), pileCards);
         root.value = minimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+        System.out.print("DONE\n\n");
+        System.out.println("calcs: " + calculations);
+        System.out.println("nodes: " + (calculations - nodeClones - nodeMapDuplicates));
+        System.out.println("clones: " + nodeClones);
+        System.out.println("dupes: " + nodeMapDuplicates);
     }
 
     private void initStateConverter(Collection<Card> maxCards, Collection<Card> minCards, Collection<Card> pile) {
-        stateConverter = new HashMap(64);
+        stateConverter.clear();
         pileCardStateShifter = maxCards.size() + minCards.size();
         int i = 0;
         for (Card card : maxCards) {
@@ -97,8 +119,15 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      * @return the score of the node
      */
     private int minimax(MinimaxNode node, int a, int b) {
+        if (calculations % (calculationLimit / 500) == 0) {
+            if (calculations % (calculationLimit / 100) == 0) {
+                System.out.print("|");
+            } else {
+                System.out.print(".");
+            }
+        }
         calculations++;
-        
+
         if (checkForWin(node)) {
             if (node.isMinNode()) {
                 return Integer.MIN_VALUE;
@@ -114,11 +143,15 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         if (node.depth * calculations > calculationLimit) {
             return estimateScore(node);
         } else {
-            List<MinimaxNode> successors;
+            List<MinimaxNode> successors = null;
             if (d == 1) {
                 successors = node.children;
             } else {
-                successors = MinimaxNodeSuccessorFinderWaffeGame2.createSuccessors(node, prwg2);
+                try {
+                    successors = SuccessorFinderWaffeGame2.createSuccessors(node, prwg2);
+                } catch (Exception ex) {
+                    Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, "\nCalculations: " + calculations + "\nNode: " + node.hashCode(), ex);
+                }
             }
             int alpha = a;
             int beta = b;
@@ -169,28 +202,31 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     private int checkMapForDuplicateNode(MinimaxNode node) {
         long state = convertStateToLong(node);
         MinimaxNode duplicate = nodeMap.get(state);
-        if (duplicate == null) {
-            nodeMap.put(state, node);
-            return 0;
-        } else {
+        if (duplicate != null) {
             if (node.equals(duplicate)) {
                 node.value = duplicate.value;
                 node.children = duplicate.children;
                 node.bestChild = duplicate.bestChild;
+                nodeClones++;
                 return 2;
             } else {
-                if (node.isMinNode()) {
-                    for (MinimaxNode child : duplicate.children) {
-                        node.children.add(new MinimaxNode(0, node.depth + 1, new HashSet(node.maxCards), new HashSet(child.minCards), new HashSet(child.pileCards)));
+                if (!duplicate.isLeafNode()) { //leaf nodes lack children
+                    if (node.isMinNode()) {
+                        for (MinimaxNode child : duplicate.children) {
+                            node.children.add(new MinimaxNode(0, node.depth + 1, node.maxCards, child.minCards, child.pileCards));
+                        }
+                    } else {
+                        for (MinimaxNode child : duplicate.children) {
+                            node.children.add(new MinimaxNode(0, node.depth + 1, child.maxCards, node.minCards, child.pileCards));
+                        }
                     }
-                } else {
-                    for (MinimaxNode child : duplicate.children) {
-                        node.children.add(new MinimaxNode(0, node.depth + 1, new HashSet(child.maxCards), new HashSet(node.minCards), new HashSet(child.pileCards)));
-                    }
+                    nodeMapDuplicates++;
+                    return 1;
                 }
-                return 1;
             }
         }
+        nodeMap.put(state, node);
+        return 0;
     }
 
     private long convertStateToLong(MinimaxNode node) {
@@ -238,6 +274,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             generateTree(cards, opponentsCards, pileCards);
         } else {
             root = node;
+//            continueMinimax(root);
         }
         if (root.bestChild.pileCards.isEmpty()) {
             return new ArrayList();
@@ -272,8 +309,6 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 return null;
             }
         }
-        //calculations = 0;
-        //continueMinimax(node);
         return node;
     }
 
@@ -315,7 +350,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     }
 
     /**
-     * Estimates the score judging by hand size and pile type
+     * Estimates the score judging by hand size and pile type. Update this!
      *
      * @param cards
      * @param opponentsCards
@@ -346,13 +381,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             }
             A = 3.0 - 2.0 / P;
         }
-
-        if (oType.toInt() >= 1 && oType.toInt() <= 4) { //other has only of one suit
-            return noZeroRounding(5 * (K * K / (Math.sqrt(k - A) * (k - A)) - 2));
-        } else {
-            return noZeroRounding(10 * Math.sqrt(K) * (K / (k - A) - 1));
-        }
-
+        return noZeroRounding(100 / (Math.sqrt(k * K)) * (K - k + A));
     }
 
     private int countJokers(Collection<Card> cards) {

@@ -34,10 +34,10 @@ public class Card {
         public int toInt() {
             return suit;
         }
-        
+
         /**
-         * The method searches through all Suits and returns the highest
-         * integer value found (which is 4, the Spades)
+         * The method searches through all Suits and returns the highest integer
+         * value found (which is 4, the Spades)
          *
          * @return the highest integer value
          */
@@ -147,4 +147,33 @@ public class Card {
             return value + " of " + suit;
         }
     }
+
+    public String shortString() {
+        if (isJoker()) {
+            return "" + suit.toString().charAt(0);
+        } else {
+            char c = 0;
+            switch (value) {
+                case ACE:
+                    c = 'A';
+                    break;
+                case TEN:
+                    c = 'T';
+                    break;
+                case JACK:
+                    c = 'J';
+                    break;
+                case QUEEN:
+                    c = 'Q';
+                    break;
+                case KING:
+                    c = 'K';
+                    break;
+                default:
+                    c = (char) (value.toInt() + 48);
+            }
+            return "" + suit.toString().charAt(0) + c;
+        }
+    }
+
 }

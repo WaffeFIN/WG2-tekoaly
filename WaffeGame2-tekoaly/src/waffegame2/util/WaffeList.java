@@ -16,6 +16,9 @@ import java.util.ListIterator;
  * @author Walter
  */
 public class WaffeList<E> implements List<E>{
+    
+    private int size;
+    private E[] array;
 
     @Override
     public int size() {

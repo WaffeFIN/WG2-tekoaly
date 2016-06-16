@@ -14,6 +14,8 @@ import java.util.Set;
  * @author Walter
  */
 public class WaffeMap<K, V> implements Map<K, V>{
+    
+    //each entry needs a next entry tag for iteration
 
     @Override
     public int size() {

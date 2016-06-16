@@ -206,6 +206,7 @@ public class PileRuleWaffeGame2 implements PileRule {
         if (maxGroup > n) {
             n = maxGroup;
         }
+        loop:
         for (; n <= 4; n++) {
             if ((njCards.size() + jokers) % n == 0) {
                 int jokersNeeded = 0;
@@ -213,6 +214,8 @@ public class PileRuleWaffeGame2 implements PileRule {
                     int group = groups[i];
                     if (group > 0) {
                         jokersNeeded += n - group;
+                        if (jokersNeeded > jokers)
+                            continue loop;
                     }
                 }
                 if (jokers >= jokersNeeded && (jokers - jokersNeeded) % n == 0) {

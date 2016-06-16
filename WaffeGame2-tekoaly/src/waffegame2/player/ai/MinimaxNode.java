@@ -42,6 +42,10 @@ public class MinimaxNode implements Comparable<MinimaxNode> {
         return (depth % 2 == 1);
     }
 
+    public boolean isLeafNode() {
+        return children.isEmpty(); //:D
+    }
+
     public Collection<Card> getNodePlayingCards() {
         if (isMinNode()) {
             return minCards;
