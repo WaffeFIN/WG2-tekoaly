@@ -20,9 +20,26 @@ public class WaffeList<E> implements List<E>{
     private int size;
     private E[] array;
 
+    public WaffeList() {
+    }
+    
+    public WaffeList(int initialSize) {
+    }
+    
+
+    @Override
+    public void clear() {
+        return; //:D
+    }
+
     @Override
     public int size() {
-        return 0; //:D
+        return size; //:D
+    }
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        return null; //:D
     }
 
     @Override
@@ -33,21 +50,6 @@ public class WaffeList<E> implements List<E>{
     @Override
     public boolean contains(Object o) {
         return false; //:D
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        return null; //:D
-    }
-
-    @Override
-    public Object[] toArray() {
-        return null; //:D
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return null; //:D
     }
 
     @Override
@@ -83,11 +85,6 @@ public class WaffeList<E> implements List<E>{
     @Override
     public boolean retainAll(Collection<?> c) {
         return false; //:D
-    }
-
-    @Override
-    public void clear() {
-        return; //:D
     }
 
     @Override
@@ -130,10 +127,20 @@ public class WaffeList<E> implements List<E>{
         return null; //:D
     }
 
+
     @Override
-    public List<E> subList(int fromIndex, int toIndex) {
+    public Iterator<E> iterator() {
         return null; //:D
     }
 
+    @Override
+    public Object[] toArray() {
+        return null; //:D
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return null; //:D
+    }
     
 }

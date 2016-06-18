@@ -5,6 +5,9 @@
  */
 package waffegame2.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.Hand;
 import waffegame2.player.Player;
@@ -42,4 +45,33 @@ public class Util {
         return n * n;
     }
 
+    
+    /**
+     * Note that jokers are included in index 0!
+     */
+    public static List<Card>[] getValueListArray(Collection<Card> cards) {
+        List<Card>[] rv = new List[Card.Value.max() + 1];
+        for (int i = 0; i < Card.Value.max() + 1; i++) {
+            rv[i] = new ArrayList();
+        }
+        for (Card card : cards) {
+            rv[card.getValue().toInt()].add(card);
+        }
+        return rv; //:D
+    }
+    
+    
+    /**
+     * Note that jokers are included in index 0!
+     */
+    public static List<Card>[] getSuitListArray(Collection<Card> cards) {
+        List<Card>[] rv = new List[Card.Suit.max() + 1];
+        for (int i = 0; i < Card.Suit.max() + 1; i++) {
+            rv[i] = new ArrayList();
+        }
+        for (Card card : cards) {
+            rv[card.getSuit().toInt()].add(card);
+        }
+        return rv; //:D
+    }
 }
