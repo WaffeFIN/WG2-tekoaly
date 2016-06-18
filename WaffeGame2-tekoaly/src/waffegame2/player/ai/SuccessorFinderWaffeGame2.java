@@ -22,7 +22,10 @@ import waffegame2.util.Util;
  */
 public class SuccessorFinderWaffeGame2 {
 
-    private static final int maxSuccessors = 70; //this can be relatively high because of clone checking
+    /**
+     * Branching factor. This can be relatively high because of sibling checking
+     */
+    private static final int maxSuccessors = 70;
 
     /**
      * Creates a list of every single (or most of the) playable combination
@@ -82,9 +85,7 @@ public class SuccessorFinderWaffeGame2 {
 
         if (rv.size() > maxSuccessors) {
             Collections.shuffle(rv);
-            rv = rv.subList(0, maxSuccessors - 1);
-            Collections.sort(rv);
-            System.out.print("C");
+            rv = rv.subList(0, maxSuccessors);
             return rv;
         } else {
             Collections.sort(rv);
@@ -104,15 +105,14 @@ public class SuccessorFinderWaffeGame2 {
     }
 
     private static void straightTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, Collection<Card> pileCards, int cycles) {
-        //jokers included?
-        List<Card>[] modifyableCardsValues = Util.getValueListArray(cards);
-        List<Card>[] modifyablePileValues = Util.getValueListArray(pileCards);
-
         if (cards.size() + pileCards.size() < 13 * cycles) {
             return;
         }
 
+        List<Card>[] modifyableCardsValues = Util.getValueListArray(cards);
+        List<Card>[] modifyablePileValues = Util.getValueListArray(pileCards);
         List<Collection<Card>> holes = new ArrayList();
+
         holes.add(new HashSet());
         boolean foundBrokenHole = false;
         boolean skipCurrentHole = true;
@@ -188,21 +188,33 @@ public class SuccessorFinderWaffeGame2 {
 
         MinimaxNode transformNode = createNewSuccessor(node, transformCards);
         int type = new PileRuleWaffeGame2().checkType(transformNode.pileCards).toInt();
-        if (type >= 1 && type <= 4) { //if the pile is a suit, ignore continuation
-            return;
+        //if the pile is anything other than a straight, ignore. Groups handled later
+        if (type == 5 || type == 10) {
+            transformNode.depth--;
+            //decrease node depth to the original node's value before continuing
+            continueStraight(transformNode, rv,
+                    transformNode.getNodePlayingCards(),
+                    Util.getValueListArray(transformNode.getNodePlayingCards()),
+                    transformNode.pileCards,
+                    Util.getValueListArray(transformNode.pileCards));
+            transformNode.depth++;
         }
-        transformNode.depth--;
-        //decrease node depth to the original node's value before continuing
-        rv.addAll(createSuccessors(transformNode, type));
-        transformNode.depth++;
     }
 
     private static void continueStraight(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues) {
+        //perfect straights
+        if (pileCards.size() % 13 == 0) {
+            addAllStraights(node, rv, cards, cardsValues);
+            return;
+        }
+
         //find both ends, check cards for values
         int lookForCount = 1 + pileCards.size() / 13;
+        
         int downValue = -1;
         int upValue = -1;
         boolean skipFirst = true;
+
         for (int i = 0; i < 2 * pileValues.length; i++) {
             int n = i % (pileValues.length - 1) + 1;
             if (skipFirst) {
@@ -329,13 +341,13 @@ public class SuccessorFinderWaffeGame2 {
         if (cardsOfSuit.isEmpty()) {
             return;
         }
-        if (cardsOfSuit.size() <= 4 || 1 << (cardsOfSuit.size() + 1) < maxSuccessors - rv.size()) {
+        if (cardsOfSuit.size() <= 4 || 1 << (cardsOfSuit.size() + 1) < maxSuccessors - rv.size()) { //full check, 2^N
             List<Collection<Card>> plays = new ArrayList();
             addSuitPermutation(plays, cardsOfSuit, 0);
             for (Collection<Card> play : plays) {
                 rv.add(createNewSuccessor(node, play));
             }
-        } else { //fast check
+        } else { //fast check, N^2
             for (int i = 0; i < cardsOfSuit.size(); i++) {
                 Collection<Card> play = new HashSet();
                 for (int j = i; j < cardsOfSuit.size(); j++) {
