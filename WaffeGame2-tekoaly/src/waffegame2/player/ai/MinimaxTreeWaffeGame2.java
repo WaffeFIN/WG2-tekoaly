@@ -130,37 +130,34 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         if (node.depth * calculations > calculationLimit) {
             return estimateScore(node);
         } else {
-            List<MinimaxNode> successors;
-            if (d == 1) {
-                successors = node.children;
-            } else {
-                successors = SuccessorFinderWaffeGame2.createSuccessors(node, prwg2.checkType(node.pileCards).toInt());
+            if (d == 0) {
+                node.successors = SuccessorFinderWaffeGame2.createSuccessors(node, prwg2.checkType(node.pileCards).toInt());
             }
             int alpha = a;
             int beta = b;
 
             if (node.isMinNode()) {
-                for (MinimaxNode successor : successors) {
+                for (MinimaxNode successor : node.successors) {
                     successor.value = minimax(successor, alpha, beta);
                     if (successor.value <= beta) {
                         beta = successor.value;
-                        node.bestChild = successor;
+                        node.bestSuccessor = successor;
                     }
                     if (beta <= alpha) {
-                        node.bestChild = successor;
+                        node.bestSuccessor = successor;
                         return alpha;
                     }
                 }
                 return beta;
             } else {
-                for (MinimaxNode successor : successors) {
+                for (MinimaxNode successor : node.successors) {
                     successor.value = minimax(successor, alpha, beta);
                     if (successor.value >= alpha) {
                         alpha = successor.value;
-                        node.bestChild = successor;
+                        node.bestSuccessor = successor;
                     }
                     if (alpha >= beta) {
-                        node.bestChild = successor;
+                        node.bestSuccessor = successor;
                         return beta;
                     }
                 }
@@ -191,8 +188,8 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         if (sibling != null) {
             if (node.equals(sibling)) {
                 node.value = sibling.value;
-                node.children = sibling.children;
-                node.bestChild = sibling.bestChild;
+                node.successors = sibling.successors;
+                node.bestSuccessor = sibling.bestSuccessor;
                 nodeClones++;
                 return 2;
             } else {
@@ -200,21 +197,27 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 //but opponents' cards must differ
                 if (!sibling.isLeafNode()) { //leaf nodes lack children
                     if (node.isMinNode()) {
-                        for (MinimaxNode child : sibling.children) {
-                            Long l = convertStateToLong(node.maxCards, child.pileCards);
+                        for (MinimaxNode nibling : sibling.successors) {
+                            if (nibling.isMinNode()) {
+                                continue;
+                            }
+                            Long l = convertStateToLong(node.maxCards, nibling.pileCards);
                             if (nodeMap.containsKey(l)) {
-                                node.children.add(nodeMap.get(l));
+                                node.successors.add(nodeMap.get(l));
                             } else {
-                                node.children.add(new MinimaxNode(0, node.depth + 1, node.maxCards, child.minCards, child.pileCards));
+                                node.successors.add(new MinimaxNode(0, node.depth + 1, node.maxCards, nibling.minCards, nibling.pileCards));
                             }
                         }
                     } else {
-                        for (MinimaxNode child : sibling.children) {
-                            Long l = convertStateToLong(node.minCards, child.pileCards);
+                        for (MinimaxNode nibling : sibling.successors) {
+                            if (!nibling.isMinNode()) {
+                                continue;
+                            }
+                            Long l = convertStateToLong(node.minCards, nibling.pileCards);
                             if (nodeMap.containsKey(l)) {
-                                node.children.add(nodeMap.get(l));
+                                node.successors.add(nodeMap.get(l));
                             } else {
-                                node.children.add(new MinimaxNode(0, node.depth + 1, child.maxCards, node.minCards, child.pileCards));
+                                node.successors.add(new MinimaxNode(0, node.depth + 1, nibling.maxCards, node.minCards, nibling.pileCards));
                             }
                         }
                     }
@@ -278,10 +281,10 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 continueMinimax(node);
             }
         }
-        if (node.bestChild.pileCards.isEmpty()) {
+        if (node.bestSuccessor.pileCards.isEmpty()) {
             return new ArrayList();
         } else {
-            HashSet<Card> play = new HashSet(node.bestChild.pileCards);
+            HashSet<Card> play = new HashSet(node.bestSuccessor.pileCards);
             play.removeAll(node.pileCards);
             return new ArrayList(play);
         }
@@ -325,13 +328,13 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     private void continueMinimax(MinimaxNode node) {
         //fix parent values! recursively?
-        if (node.children.isEmpty()) {
+        if (node.successors.isEmpty()) {
             if (node.value != Integer.MAX_VALUE && node.value != Integer.MIN_VALUE) {
                 node.value = minimax(node, Integer.MIN_VALUE, Integer.MAX_VALUE);
             }
         } else {
-            Collections.sort(node.children);
-            for (MinimaxNode child : node.children) {
+            Collections.sort(node.successors, new MinimaxNodeComparator());
+            for (MinimaxNode child : node.successors) {
                 continueMinimax(child);
             }
         }

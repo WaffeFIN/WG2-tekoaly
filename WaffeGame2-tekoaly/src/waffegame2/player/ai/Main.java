@@ -26,19 +26,24 @@ public class Main {
 //        estimationTestSetSmall(limit);
 //        estimationTestSetOutnumbered(limit);
 //        estimationTestSetBig(limit);
-        estimationTestRandom(limit, 10, 13, 18);
-//
+        estimationTestRandom(limit, 1000, 11, 13);
+
 //        PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
-//        MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2, 20000000);
+//        MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2, limit);
 //        List<Card> myCards = new ArrayList();
 //        List<Card> othersCards = new ArrayList();
 //        List<Card> pileCards = new ArrayList();
-//
+
 //        this is very difficult to calculate
 //        addCardSet6(myCards);
 //        addCardSet3(myCards);
 //        addCardSet5(othersCards);
 //        addCardSet1(othersCards);
+        
+//        addCardSet4(myCards);
+//        addCardSet1(othersCards);
+//        addCardSet2(othersCards);
+//        
 //        tree.generateTree(myCards, othersCards, pileCards);
 //        System.out.println(tree);
 //
@@ -57,7 +62,7 @@ public class Main {
         } else {
             System.out.println(spaces + root.value);
         }
-        for (MinimaxNode child : root.children) {
+        for (MinimaxNode child : root.successors) {
             if (child.depth == root.depth + 1) {
                 printTree(child);
             } else {
@@ -76,8 +81,8 @@ public class Main {
             System.out.print(card.shortString() + ":");
         }
         System.out.println("");
-        if (root.bestChild != null) {
-            printMoveSeq(root.bestChild);
+        if (root.bestSuccessor != null) {
+            printMoveSeq(root.bestSuccessor);
         } else {
             System.out.print(".:");
             for (Card card : root.getNodePlayingCards()) {

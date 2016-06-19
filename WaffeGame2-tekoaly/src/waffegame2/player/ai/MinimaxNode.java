@@ -17,7 +17,7 @@ import waffegame2.card.Card;
  *
  * @author Walter
  */
-public class MinimaxNode implements Comparable<MinimaxNode> {
+public class MinimaxNode {
 
     int value;
     int depth;
@@ -26,8 +26,8 @@ public class MinimaxNode implements Comparable<MinimaxNode> {
     HashSet<Card> minCards;
     HashSet<Card> pileCards;
 
-    List<MinimaxNode> children;
-    MinimaxNode bestChild;
+    List<MinimaxNode> successors;
+    MinimaxNode bestSuccessor;
 
     public MinimaxNode(int value, int depth, HashSet<Card> maxCards, HashSet<Card> minCards, HashSet<Card> pileCards) {
         this.value = value;
@@ -35,7 +35,11 @@ public class MinimaxNode implements Comparable<MinimaxNode> {
         this.maxCards = maxCards;
         this.minCards = minCards;
         this.pileCards = pileCards;
-        this.children = new ArrayList();
+        this.successors = new ArrayList();
+    }
+
+    public MinimaxNode() {
+        this(0, 0, null, null, null);
     }
 
     public boolean isMinNode() {
@@ -43,7 +47,7 @@ public class MinimaxNode implements Comparable<MinimaxNode> {
     }
 
     public boolean isLeafNode() {
-        return children.isEmpty(); //:D
+        return successors.isEmpty(); //:D
     }
 
     public Collection<Card> getNodePlayingCards() {
@@ -82,16 +86,5 @@ public class MinimaxNode implements Comparable<MinimaxNode> {
         hash = 67 * hash + Objects.hashCode(this.minCards);
         hash = 67 * hash + Objects.hashCode(this.pileCards);
         return hash;
-    }
-
-    @Override
-    public int compareTo(MinimaxNode o) {
-        if (Math.abs(value) > Math.abs(o.value)) {
-            return -1;
-        } else if (Math.abs(value) > Math.abs(o.value)) {
-            return 1;
-        } else {
-            return 0;
-        }
     }
 }

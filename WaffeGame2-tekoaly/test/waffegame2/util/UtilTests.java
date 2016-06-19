@@ -30,4 +30,8 @@ public class UtilTests {
         assertEquals(false, Util.isInteger("-17asd"));
         assertEquals(false, Util.isInteger("0.3"));
     }
+    
+    //getValueListArray
+    
+    //getSuitListArray
 }

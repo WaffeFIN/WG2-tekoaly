@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
@@ -38,7 +40,7 @@ public class SuccessorFinderWaffeGame2 {
         Collection<Card> pileCards = node.pileCards;
 
         if (pileCards.size() > 0 && pileType == PileTypeWaffeGame2.NULL.toInt()) {
-            System.out.println("Invalid piletype in successor! Size: " + pileCards.size());
+            Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Invalid piletype in node!"));
             return null;
         }
 
@@ -61,7 +63,7 @@ public class SuccessorFinderWaffeGame2 {
             case 2:
             case 3:
             case 4:
-                straightTransform(node, rv, cards, pileCards, 0);
+                straightTransform(node, rv, cards, cardsValues, pileCards, pileValues, 0);
                 groupTransform(node, rv, cards, cardsValues, pileCards, pileValues, 2);
                 addAllSuitCombos(node, rv, cards, pileType);
                 break;
@@ -75,7 +77,7 @@ public class SuccessorFinderWaffeGame2 {
                 groupTransform(node, rv, cards, cardsValues, pileCards, pileValues, pileType - 3);
             case 8:
                 continueGroups(node, rv, cards, cardsValues, pileCards, pileValues, pileType - 4);
-                straightTransform(node, rv, cards, pileCards, pileType - 5);
+                straightTransform(node, rv, cards, cardsValues, pileCards, pileValues, pileType - 5);
                 break;
             case 9:
                 addAllStraights(node, rv, cards, cardsValues);
@@ -88,7 +90,7 @@ public class SuccessorFinderWaffeGame2 {
             rv = rv.subList(0, maxSuccessors);
             return rv;
         } else {
-            Collections.sort(rv);
+            Collections.sort(rv, new MinimaxNodeComparator());
             if (rv.isEmpty()) {
                 rv.add(createNewSuccessor(node, null));
             }
@@ -98,27 +100,22 @@ public class SuccessorFinderWaffeGame2 {
 
     private static void addAllStraights(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues) {
         for (int i = 1; i <= 13; i++) {
-            if (cardsValues[i].size() > 0) {
-                continueStraightDir(node, rv, cards, cardsValues, 1, i % 13 + 1, true);
-            }
+            continueStraightDir(node, rv, cards, cardsValues, 1, i % 13 + 1, true);
         }
     }
 
-    private static void straightTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, Collection<Card> pileCards, int cycles) {
+    private static void straightTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues, int cycles) {
         if (cards.size() + pileCards.size() < 13 * cycles) {
             return;
         }
-
-        List<Card>[] modifyableCardsValues = Util.getValueListArray(cards);
-        List<Card>[] modifyablePileValues = Util.getValueListArray(pileCards);
         List<Collection<Card>> holes = new ArrayList();
 
         holes.add(new HashSet());
         boolean foundBrokenHole = false;
         boolean skipCurrentHole = true;
         for (int n = 1; true; n++) {
-            int i = (n + (modifyablePileValues.length - 1) * 4 - 1) % (modifyablePileValues.length - 1) + 1;
-            List<Card> pileList = modifyablePileValues[i];
+            int i = (n + (pileValues.length - 1) * 4 - 1) % (pileValues.length - 1) + 1;
+            List<Card> pileList = pileValues[i];
             if (skipCurrentHole) {
                 if (pileList.size() <= cycles) {
                     continue;
@@ -126,7 +123,7 @@ public class SuccessorFinderWaffeGame2 {
                 skipCurrentHole = false;
             }
             if (pileList.size() <= cycles) {
-                List<Card> cardsList = modifyableCardsValues[i];
+                List<Card> cardsList = cardsValues[i];
                 if (cardsList.size() <= cycles) {
                     if (foundBrokenHole) {
                         return;
@@ -144,7 +141,7 @@ public class SuccessorFinderWaffeGame2 {
                 if (pileList.size() > cycles + 1) {
                     return; //should never happen
                 }
-                if (n >= modifyablePileValues.length) {
+                if (n >= pileValues.length) {
                     break;
                 }
                 if (!holes.get(holes.size() - 1).isEmpty()) {
@@ -152,10 +149,14 @@ public class SuccessorFinderWaffeGame2 {
                 }
             }
         }
+
         if (holes.get(holes.size() - 1).isEmpty()) {
             holes.remove(holes.size() - 1);
         }
         if (holes.isEmpty()) {
+            if (cycles == 0) { //since there is only one broken hole, the pile must be a straight
+                continueStraight(node, rv, cards, cardsValues, pileCards, pileValues);
+            }
             return;
         }
         if (foundBrokenHole) {
@@ -185,8 +186,9 @@ public class SuccessorFinderWaffeGame2 {
     }
 
     private static void straightTransform2(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> transformCards) {
-
         MinimaxNode transformNode = createNewSuccessor(node, transformCards);
+        rv.add(transformNode);
+
         int type = new PileRuleWaffeGame2().checkType(transformNode.pileCards).toInt();
         //if the pile is anything other than a straight, ignore. Groups handled later
         if (type == 5 || type == 10) {
@@ -210,7 +212,7 @@ public class SuccessorFinderWaffeGame2 {
 
         //find both ends, check cards for values
         int lookForCount = 1 + pileCards.size() / 13;
-        
+
         int downValue = -1;
         int upValue = -1;
         boolean skipFirst = true;
@@ -276,12 +278,11 @@ public class SuccessorFinderWaffeGame2 {
     }
 
     private static void groupTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues, int groupSize) {
-        MinimaxNode transformNode;
         Collection<Card> transformCards = new ArrayList();
 
         //Make transform node
         for (int j = 1; j < pileValues.length; j++) {
-            if (!pileValues[j].isEmpty()) {
+            if (pileValues[j].size() == groupSize - 1) {
                 if (cardsValues[j].isEmpty()) {
                     return;
                 } else {
@@ -292,10 +293,24 @@ public class SuccessorFinderWaffeGame2 {
         if (transformCards.isEmpty()) {
             return;
         }
-        transformNode = createNewSuccessor(node, transformCards);
+
+        MinimaxNode transformNode = createNewSuccessor(node, transformCards);
+
+        rv.add(transformNode);
         //decrease node depth to the original node's value
         transformNode.depth--;
-        rv.addAll(createSuccessors(transformNode, groupSize + 4));
+        continueGroups(transformNode, rv,
+                transformNode.getNodePlayingCards(),
+                Util.getValueListArray(transformNode.getNodePlayingCards()),
+                transformNode.pileCards,
+                Util.getValueListArray(transformNode.pileCards), groupSize);
+        if (groupSize < 4) {
+            groupTransform(transformNode, rv,
+                    transformNode.getNodePlayingCards(),
+                    Util.getValueListArray(transformNode.getNodePlayingCards()),
+                    transformNode.pileCards,
+                    Util.getValueListArray(transformNode.pileCards), groupSize + 1);
+        }
         transformNode.depth++;
         //note that this method leaves children to the original node with same depth value.
     }
@@ -399,17 +414,22 @@ public class SuccessorFinderWaffeGame2 {
             }
         }
         MinimaxNode rv = new MinimaxNode(0, parent.depth + 1, maxCards, minCards, pileCards);
-        parent.children.add(rv);
         return rv;
     }
 
-    private static void transferCards(Collection<Card> play, Collection<Card> from, Collection<Card> to) {
+    private static boolean transferCards(Collection<Card> play, Collection<Card> from, Collection<Card> to) {
         for (Card card : play) {
-            if (from.remove(card)) {
-                to.add(card);
+            if (!from.remove(card)) {
+                Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Tried transferring card that didn't belong to Collection!"));
+                return false;
             } else {
-                System.out.println("PROBLEM TRANSFERRING CARDS");
+                if (!to.add(card)) {
+                    Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Tried adding a card to a Collection which already contains it!"));
+                    from.add(card);
+                    return false;
+                }
             }
         }
+        return true;
     }
 }
