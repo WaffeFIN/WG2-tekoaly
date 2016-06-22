@@ -21,6 +21,7 @@ public class MinimaxTreeWaffeGame2Tests {
     private MinimaxTreeWaffeGame2 tree;
     private HashSet<Card> myCards;
     private HashSet<Card> othersCards;
+    private HashSet<Card> pileCards;
 
     public MinimaxTreeWaffeGame2Tests() {
     }
@@ -30,6 +31,7 @@ public class MinimaxTreeWaffeGame2Tests {
         tree = new MinimaxTreeWaffeGame2(new PileRuleWaffeGame2(), 1000000);
         myCards = new HashSet();
         othersCards = new HashSet();
+        pileCards = new HashSet();
     }
 
     // TODO add test methods here.
@@ -149,6 +151,22 @@ public class MinimaxTreeWaffeGame2Tests {
     }
     
     @Test
+    public void treeGenerationTestStraightLoss() {
+        myCards.add(new Card(Card.Value.ACE, Card.Suit.HEARTS));
+        myCards.add(new Card(Card.Value.FOUR, Card.Suit.CLUBS));
+        myCards.add(new Card(Card.Value.JACK, Card.Suit.DIAMONDS));
+        othersCards.add(new Card(Card.Value.TWO, Card.Suit.SPADES));
+        othersCards.add(new Card(Card.Value.KING, Card.Suit.CLUBS));
+        othersCards.add(new Card(Card.Value.QUEEN, Card.Suit.SPADES));
+        othersCards.add(new Card(Card.Value.THREE, Card.Suit.CLUBS));
+        othersCards.add(new Card(Card.Value.EIGHT, Card.Suit.DIAMONDS));
+
+        tree.generateTree(myCards, othersCards, null);
+
+        assertEquals(Integer.MIN_VALUE, tree.root.value);
+    }
+    
+    @Test
     public void treeGenerationTestSimple2() {
         myCards.add(new Card(Card.Value.SIX, Card.Suit.HEARTS));
         myCards.add(new Card(Card.Value.ACE, Card.Suit.SPADES));
@@ -165,7 +183,7 @@ public class MinimaxTreeWaffeGame2Tests {
     }
     
     @Test
-    public void treeGenerationTestProblem() {
+    public void treeGenerationTestProblem1() {
         myCards.add(new Card(Card.Value.JACK, Card.Suit.SPADES));
         myCards.add(new Card(Card.Value.EIGHT, Card.Suit.CLUBS));
         myCards.add(new Card(Card.Value.FIVE, Card.Suit.DIAMONDS));
@@ -181,6 +199,33 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MAX_VALUE, tree.root.value);
     }
+    
+//    @Test
+//    public void treeGenerationTestProblem2() {
+//        pileCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
+//        pileCards.add(new Card(Card.Value.THREE, Card.Suit.SPADES));
+//        myCards.add(new Card(Card.Value.ACE, Card.Suit.HEARTS));
+//        myCards.add(new Card(Card.Value.FOUR, Card.Suit.SPADES));
+//        myCards.add(new Card(Card.Value.SEVEN, Card.Suit.CLUBS));
+//        myCards.add(new Card(Card.Value.TEN, Card.Suit.DIAMONDS));
+//        othersCards.add(new Card(Card.Value.TWO, Card.Suit.CLUBS));
+//        othersCards.add(new Card(Card.Value.FIVE, Card.Suit.CLUBS));
+//        othersCards.add(new Card(Card.Value.JACK, Card.Suit.SPADES));
+//
+//        tree.generateTree(myCards, othersCards, null);
+//
+//        assertEquals(Integer.MAX_VALUE, tree.root.value);
+//        /*
+//        Winning line:
+//        HA S4
+//        C5
+//        
+//        2C
+//        7C
+//        
+//        10D Win
+//        */
+//    }
     
     @Test
     public void roughScoreEstimationTest() {

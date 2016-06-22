@@ -6,6 +6,7 @@
 package waffegame2.player.ai;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import waffegame2.card.Card;
@@ -22,70 +23,74 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int limit = 20000000;
-//        estimationTestSetSmall(limit);
-//        estimationTestSetOutnumbered(limit);
-//        estimationTestSetBig(limit);
-        estimationTestRandom(limit, 1000, 11, 13);
+        int softLimit = 10000000;
+//        estimationTestSetSmall(softLimit);
+//        estimationTestSetOutnumbered(softLimit);
+//        estimationTestSetBig(softLimit);
+//        estimationTestRandom(softLimit, 1, 6, 8, true);
 
-//        PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
-//        MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2, limit);
-//        List<Card> myCards = new ArrayList();
-//        List<Card> othersCards = new ArrayList();
-//        List<Card> pileCards = new ArrayList();
+        PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
+        MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2, softLimit);
+        List<Card> myCards = new ArrayList();
+        List<Card> othersCards = new ArrayList();
+        List<Card> pileCards = new ArrayList();
 
-//        this is very difficult to calculate
-//        addCardSet6(myCards);
-//        addCardSet3(myCards);
-//        addCardSet5(othersCards);
-//        addCardSet1(othersCards);
+//        this is one of the hardest combos to evaluate
+//        10M Limit, max 200 successors -> 0:26
+        addCardSet1(myCards);
+        addCardSet4(myCards);
+        addCardSet5(othersCards);
+        addCardSet6(othersCards);
         
-//        addCardSet4(myCards);
-//        addCardSet1(othersCards);
-//        addCardSet2(othersCards);
-//        
-//        tree.generateTree(myCards, othersCards, pileCards);
-//        System.out.println(tree);
-//
-//        System.out.println("-------------");
-//        printMoveSeq(tree.root);
-//        System.out.println("-------------");
+//        addCardSet2(myCards);
+//        addCardSet6(othersCards);
+
+        printCards(myCards);
+        printCards(othersCards);
+        System.out.println("");
+        tree.generateTree(myCards, othersCards, pileCards);
+        System.out.println(tree);
+
+        System.out.println("-------------");
+        printMoveSeq(tree.root);
+        System.out.println("-------------");
     }
 
-    private static void printTree(MinimaxNode root) {
-        String spaces = "";
-        for (int i = 0; i < root.depth; i++) {
-            spaces += ' ';
+    private static void printCards(Collection<Card> cards) {
+        for (Card card : cards) {
+            System.out.print(card.shortString() + ":");
         }
-        if (root.value == 0) {
-            System.out.println(spaces + "N/V");
-        } else {
-            System.out.println(spaces + root.value);
-        }
-        for (MinimaxNode child : root.successors) {
-            if (child.depth == root.depth + 1) {
-                printTree(child);
-            } else {
-                System.out.println(spaces + " Duplicate");
-            }
-        }
+        System.out.println("");
     }
 
-    private static void printMoveSeq(MinimaxNode root) {
-        if (root.isMinNode()) {
+    private static void printMoveSeq(MinimaxNode node) {
+        if (node.isMinNode()) {
             System.out.print("+:");
         } else {
             System.out.print("-:");
         }
-        for (Card card : root.pileCards) {
+        for (Card card : node.pileCards) {
             System.out.print(card.shortString() + ":");
         }
         System.out.println("");
-        if (root.bestSuccessor != null) {
-            printMoveSeq(root.bestSuccessor);
+        if (node.bestSuccessor != null) {
+            printMoveSeq(node.bestSuccessor);
         } else {
-            System.out.print(".:");
-            for (Card card : root.getNodePlayingCards()) {
+            if (node.isMinNode()) {
+                System.out.print("- :");
+            } else {
+                System.out.print("+ :");
+            }
+            for (Card card : node.getNodePlayingCards()) {
+                System.out.print(card.shortString() + ":");
+            }
+            System.out.println("");
+            if (node.isMinNode()) {
+                System.out.print("+ :");
+            } else {
+                System.out.print("- :");
+            }
+            for (Card card : node.getNodeOpponentsCards()) {
                 System.out.print(card.shortString() + ":");
             }
             System.out.println("");
@@ -243,9 +248,9 @@ public class Main {
 
                         System.out.println("-------------");
                         tree.generateTree(myCards, othersCards, null);
-                        System.out.println(tree);
-                        System.out.println("-------------");
                         System.out.println("Estimate: " + estimate);
+                        System.out.println("-------------");
+                        System.out.println(tree);
                         System.out.println("-------------");
 
                         correctness += estimate * Math.signum(tree.root.value);
@@ -269,9 +274,11 @@ public class Main {
         int count = 0;
         int error = 0;
         int errorCount = 0;
+        int wins = 0;
+        int losses = 0;
 
         PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
-        for (int i = 1; i < 7; i++) {
+        for (int i = 1; i < 6; i++) {
             for (int k = i + 1; k < 7; k++) {
                 List<Card> myCards = new ArrayList();
                 addCardSet(i, myCards);
@@ -291,9 +298,9 @@ public class Main {
 
                             System.out.println("-------------");
                             tree.generateTree(myCards, othersCards, null);
-                            System.out.println(tree);
-                            System.out.println("-------------");
                             System.out.println("Estimate: " + estimate);
+                            System.out.println("-------------");
+                            System.out.println(tree);
                             System.out.println("-------------");
 
                             correctness += estimate * Math.signum(tree.root.value);
@@ -303,6 +310,12 @@ public class Main {
                                 error += Math.abs(estimate);
                                 errorCount++;
                             }
+
+                            if (tree.root.value == Integer.MAX_VALUE) {
+                                wins++;
+                            } else if (tree.root.value == Integer.MIN_VALUE) {
+                                losses++;
+                            }
                         }
                     }
                 }
@@ -311,9 +324,13 @@ public class Main {
         System.out.println("\n\nEstimation correctness: " + (double) correctness / count);
         System.out.println("Average error: " + (double) error / Math.max(1, errorCount));
         System.out.println("Errors: " + errorCount);
+        System.out.println("\nWins: " + wins);
+        System.out.println("Losses: " + losses);
+        System.out.println("Undetermined: " + (count - wins - losses));
+        System.out.println("");
     }
 
-    private static void estimationTestRandom(int limit, int n, int c1size, int c2size) {
+    private static void estimationTestRandom(int limit, int n, int c1size, int c2size, boolean print) {
         if (c1size + c2size > 52) {
             System.out.println("Too many cards to deal: " + (c1size + c2size));
             return;
@@ -349,15 +366,17 @@ public class Main {
 
             int estimate = tree.estimateScore(myCards, othersCards, null);
 
-            System.out.print("\nRandom test #" + (i + 1) + ": |");
-            for (Card card : myCards) {
-                System.out.print(card.shortString() + "|");
+            if (print) {
+                System.out.print("\nRandom test #" + (i + 1) + ": |");
+                for (Card card : myCards) {
+                    System.out.print(card.shortString() + "|");
+                }
+                System.out.print(" vs |");
+                for (Card card : othersCards) {
+                    System.out.print(card.shortString() + "|");
+                }
+                System.out.println("");
             }
-            System.out.print(" vs |");
-            for (Card card : othersCards) {
-                System.out.print(card.shortString() + "|");
-            }
-            System.out.println("");
 //            System.out.println("-------------");
             tree.generateTree(myCards, othersCards, null);
 //            System.out.println(tree);
@@ -377,13 +396,17 @@ public class Main {
                 wins++;
             } else if (tree.root.value == Integer.MIN_VALUE) {
                 losses++;
+            } else {
+                if (print) {
+                    System.out.print("\t\tEstimated score: " + tree.root.value);
+                }
             }
         }
-        System.out.println("\n\nCorrectness: " + (double) correctness / count);
-        System.out.println("\n\nAverage error: " + (double) error / Math.max(1, errorCount));
-        System.out.println("Errors: " + errorCount);
+//        System.out.println("\n\nCorrectness: " + (double) correctness / count);
+//        System.out.println("\n\nAverage error: " + (double) error / Math.max(1, errorCount));
+//        System.out.println("Errors: " + errorCount);
         System.out.println("\nWins: " + wins);
-        System.out.println("Losses: " + losses);
+//        System.out.println("Losses: " + losses);
         System.out.println("Undetermined: " + (count - wins - losses));
         System.out.println("");
     }

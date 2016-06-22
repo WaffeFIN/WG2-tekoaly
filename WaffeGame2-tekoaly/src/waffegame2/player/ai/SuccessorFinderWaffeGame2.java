@@ -27,7 +27,7 @@ public class SuccessorFinderWaffeGame2 {
     /**
      * Branching factor. This can be relatively high because of sibling checking
      */
-    private static final int maxSuccessors = 70;
+    private static final int maxSuccessors = 200;
 
     /**
      * Creates a list of every single (or most of the) playable combination
@@ -88,11 +88,13 @@ public class SuccessorFinderWaffeGame2 {
         if (rv.size() > maxSuccessors) {
             Collections.shuffle(rv);
             rv = rv.subList(0, maxSuccessors);
+            Collections.sort(rv, new MinimaxNodePlayComparator());
             return rv;
         } else {
-            Collections.sort(rv, new MinimaxNodeComparator());
             if (rv.isEmpty()) {
                 rv.add(createNewSuccessor(node, null));
+            } else {
+                Collections.sort(rv, new MinimaxNodePlayComparator());
             }
             return rv;
         }
@@ -243,7 +245,7 @@ public class SuccessorFinderWaffeGame2 {
         if (downValue == -1 || upValue == -1) {
             return; //should never happen
         }
-        //DOESN'T TAKE COUNT POSSIBILITIES OF CONTINUING BOTH ENDS!
+        
         continueStraightDir(node, rv, cards, cardsValues, -1, downValue, false);
         continueStraightDir(node, rv, cards, cardsValues, 1, upValue, false);
     }
@@ -265,7 +267,7 @@ public class SuccessorFinderWaffeGame2 {
             } else {
                 return;
             }
-            if (i == (start + 51 - d) % 13 + 1) {
+            if (i == (start + (cardsValues.length - 1) * 4 - d) % 13 + 1) {
                 cycle++;
             }
         }
