@@ -26,7 +26,7 @@ public abstract class MinimaxTree {
      */
     abstract public void generateTree(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
 
-    abstract public List<Card> findBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards, boolean advanceBranch);
+    abstract public List<Card> findBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
     
     abstract public int estimateScore(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards);
 }

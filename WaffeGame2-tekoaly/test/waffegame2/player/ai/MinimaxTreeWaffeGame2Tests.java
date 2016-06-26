@@ -99,7 +99,7 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MIN_VALUE, tree.root.value);
     }
-    
+
     @Test
     public void treeGenerationTestPairsLoss() {
         myCards.add(new Card(Card.Value.EIGHT, Card.Suit.DIAMONDS));
@@ -117,7 +117,7 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MIN_VALUE, tree.root.value);
     }
-    
+
     @Test
     public void treeGenerationTestGroupLoss() {
         myCards.add(new Card(Card.Value.EIGHT, Card.Suit.DIAMONDS));
@@ -128,14 +128,13 @@ public class MinimaxTreeWaffeGame2Tests {
         othersCards.add(new Card(Card.Value.ACE, Card.Suit.DIAMONDS));
         othersCards.add(new Card(Card.Value.THREE, Card.Suit.DIAMONDS));
 
-
         tree.generateTree(myCards, othersCards, null);
 
         assertEquals(Integer.MIN_VALUE, tree.root.value);
     }
-    
+
     @Test
-    public void treeGenerationTestStraightWin() {
+    public void treeGenerationTestStraightWin1() {
         myCards.add(new Card(Card.Value.EIGHT, Card.Suit.DIAMONDS));
         myCards.add(new Card(Card.Value.NINE, Card.Suit.SPADES));
         myCards.add(new Card(Card.Value.SIX, Card.Suit.CLUBS));
@@ -149,7 +148,51 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MAX_VALUE, tree.root.value);
     }
-    
+
+    @Test
+    public void treeGenerationTestStraightWin2() {
+        myCards.add(new Card(Card.Value.ACE, Card.Suit.DIAMONDS));
+        myCards.add(new Card(Card.Value.KING, Card.Suit.SPADES));
+        myCards.add(new Card(Card.Value.QUEEN, Card.Suit.CLUBS));
+        othersCards.add(new Card(Card.Value.FIVE, Card.Suit.CLUBS));
+        othersCards.add(new Card(Card.Value.FIVE, Card.Suit.SPADES));
+        pileCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
+        pileCards.add(new Card(Card.Value.THREE, Card.Suit.SPADES));
+
+        tree.generateTree(myCards, othersCards, pileCards);
+
+        assertEquals(Integer.MAX_VALUE, tree.root.value);
+    }
+
+    @Test
+    public void treeGenerationTestStraightWin3() {
+        myCards.add(new Card(Card.Value.FOUR, Card.Suit.DIAMONDS));
+        myCards.add(new Card(Card.Value.FIVE, Card.Suit.SPADES));
+        othersCards.add(new Card(Card.Value.ACE, Card.Suit.CLUBS));
+        othersCards.add(new Card(Card.Value.ACE, Card.Suit.SPADES));
+        pileCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
+        pileCards.add(new Card(Card.Value.THREE, Card.Suit.SPADES));
+
+        tree.generateTree(myCards, othersCards, pileCards);
+
+        assertEquals(Integer.MAX_VALUE, tree.root.value);
+    }
+
+    @Test
+    public void treeGenerationTestStraightTransformWin() {
+        myCards.add(new Card(Card.Value.SEVEN, Card.Suit.SPADES));
+        myCards.add(new Card(Card.Value.EIGHT, Card.Suit.SPADES));
+        othersCards.add(new Card(Card.Value.FOUR, Card.Suit.DIAMONDS));
+        othersCards.add(new Card(Card.Value.FOUR, Card.Suit.CLUBS));
+        othersCards.add(new Card(Card.Value.FOUR, Card.Suit.SPADES));
+        pileCards.add(new Card(Card.Value.SIX, Card.Suit.DIAMONDS));
+        pileCards.add(new Card(Card.Value.NINE, Card.Suit.DIAMONDS));
+
+        tree.generateTree(myCards, othersCards, null);
+
+        assertEquals(Integer.MAX_VALUE, tree.root.value);
+    }
+
     @Test
     public void treeGenerationTestStraightLoss() {
         myCards.add(new Card(Card.Value.ACE, Card.Suit.HEARTS));
@@ -165,7 +208,7 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MIN_VALUE, tree.root.value);
     }
-    
+
     @Test
     public void treeGenerationTestSimple2() {
         myCards.add(new Card(Card.Value.SIX, Card.Suit.HEARTS));
@@ -181,16 +224,16 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MIN_VALUE, tree.root.value);
     }
-    
+
     @Test
     public void treeGenerationTestProblem1() {
+        myCards.add(new Card(Card.Value.QUEEN, Card.Suit.HEARTS));
         myCards.add(new Card(Card.Value.JACK, Card.Suit.SPADES));
-        myCards.add(new Card(Card.Value.EIGHT, Card.Suit.CLUBS));
+        myCards.add(new Card(Card.Value.SIX, Card.Suit.HEARTS));
         myCards.add(new Card(Card.Value.FIVE, Card.Suit.DIAMONDS));
         myCards.add(new Card(Card.Value.FOUR, Card.Suit.DIAMONDS));
+        myCards.add(new Card(Card.Value.EIGHT, Card.Suit.CLUBS));
         myCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
-        myCards.add(new Card(Card.Value.SIX, Card.Suit.HEARTS));
-        myCards.add(new Card(Card.Value.QUEEN, Card.Suit.HEARTS));
         othersCards.add(new Card(Card.Value.ACE, Card.Suit.SPADES));
         othersCards.add(new Card(Card.Value.EIGHT, Card.Suit.SPADES));
         othersCards.add(new Card(Card.Value.SEVEN, Card.Suit.SPADES));
@@ -199,7 +242,7 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MAX_VALUE, tree.root.value);
     }
-    
+
 //    @Test
 //    public void treeGenerationTestProblem2() {
 //        pileCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
@@ -226,7 +269,6 @@ public class MinimaxTreeWaffeGame2Tests {
 //        10D Win
 //        */
 //    }
-    
     @Test
     public void roughScoreEstimationTest() {
 //        tree.estimateScore(null, null, null);

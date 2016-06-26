@@ -7,7 +7,6 @@ package waffegame2.player.ai;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -66,12 +65,17 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     public void generateTree(Collection<Card> maxCards, Collection<Card> minCards, Collection<Card> pile) {
         if (maxCards.size() + minCards.size() >= 32) {
             Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Too many cards for tree generation!"));
+            return;
         }
 
         HashSet<Card> pileCards;
-        if (pile == null) {
+        if (pile == null || pile.isEmpty()) {
             pileCards = new HashSet();
         } else {
+            if (prwg2.checkType(pile) == PileTypeWaffeGame2.NULL) {
+                Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Invalid piletype"));
+                return;
+            }
             pileCards = new HashSet(pile);
         }
 
@@ -205,6 +209,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 //we know the playing cards and pile cards match
                 //but opponents' cards must differ
                 if (!sibling.isLeafNode()) { //leaf nodes lack children
+//                    node.successors.clear();
                     if (node.isMinNode()) {
                         for (MinimaxNode nibling : sibling.successors) {
                             if (nibling.isMinNode()) {
@@ -286,13 +291,11 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      * @param cards the cards of who goes first
      * @param opponentsCards the cards of the responder
      * @param pileCards the cards in the pile
-     * @param advanceBranch if set to true, the tree branch is advanced and
-     * re-evaluated
      * @return A list containing the best move to be played by whoever holds the
      * 'cards'
      */
     @Override
-    public List<Card> findBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards, boolean advanceBranch) {
+    public List<Card> findBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
         if (pileCards == null) {
             pileCards = new HashSet();
         }
@@ -301,7 +304,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             generateTree(cards, opponentsCards, pileCards);
             node = root;
         } else {
-            if (advanceBranch && node.value != Integer.MAX_VALUE && node.value != Integer.MIN_VALUE) {
+            if (false && node.value != Integer.MAX_VALUE && node.value != Integer.MIN_VALUE) {
                 continueMinimax(node);
             }
         }
@@ -364,12 +367,6 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     @Override
     public int estimateScore(Collection<Card> cards, Collection<Card> oCards, Collection<Card> pileCards) {
-//        if (cards.size() == 1) { //you have one card and can't hit it
-//            if (!pileCards.isEmpty()) {
-//                return Integer.MIN_VALUE;
-//            }
-//        }
-
         if (pileCards == null) {
             pileCards = new HashSet();
         }

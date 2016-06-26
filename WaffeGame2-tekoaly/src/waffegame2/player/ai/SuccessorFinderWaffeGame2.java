@@ -106,11 +106,12 @@ public class SuccessorFinderWaffeGame2 {
         }
     }
 
-    private static void straightTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues, int cycles) {
+    private static void straightTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cV, Collection<Card> pileCards, List<Card>[] pileValues, int cycles) {
         if (cards.size() + pileCards.size() < 13 * cycles) {
             return;
         }
         List<Collection<Card>> holes = new ArrayList();
+        List<Card>[] cardsValues = Util.getValueListArray(cards);
 
         holes.add(new HashSet());
         boolean foundBrokenHole = false;
@@ -136,7 +137,7 @@ public class SuccessorFinderWaffeGame2 {
                     }
                 } else {
                     for (int j = 0; j <= cycles - pileList.size(); j++) {
-                        holes.get(holes.size() - 1).add(cardsList.remove(0));
+                        holes.get(holes.size() - 1).add(cardsList.remove(0));//ERROR <========================
                     }
                 }
             } else {
@@ -157,7 +158,7 @@ public class SuccessorFinderWaffeGame2 {
         }
         if (holes.isEmpty()) {
             if (cycles == 0) { //since there is only one broken hole, the pile must be a straight
-                continueStraight(node, rv, cards, cardsValues, pileCards, pileValues);
+                continueStraight(node, rv, cards, cV, pileCards, pileValues);
             }
             return;
         }
@@ -245,7 +246,7 @@ public class SuccessorFinderWaffeGame2 {
         if (downValue == -1 || upValue == -1) {
             return; //should never happen
         }
-        
+
         continueStraightDir(node, rv, cards, cardsValues, -1, downValue, false);
         continueStraightDir(node, rv, cards, cardsValues, 1, upValue, false);
     }
@@ -267,7 +268,7 @@ public class SuccessorFinderWaffeGame2 {
             } else {
                 return;
             }
-            if (i == (start + (cardsValues.length - 1) * 4 - d) % 13 + 1) {
+            if (i == (start + (cardsValues.length - 1) * 4 - 1 - d) % (cardsValues.length - 1) + 1) {
                 cycle++;
             }
         }
@@ -290,6 +291,8 @@ public class SuccessorFinderWaffeGame2 {
                 } else {
                     transformCards.add(cardsValues[j].get(0)); //this choise could be improved
                 }
+            } else if (pileValues[j].size() > groupSize - 1) {
+                return;
             }
         }
         if (transformCards.isEmpty()) {
@@ -433,5 +436,13 @@ public class SuccessorFinderWaffeGame2 {
             }
         }
         return true;
+    }
+
+    private static boolean checkSum(Collection<Card> cards, List<Card>[] cardsValues) {
+        int sum = 0;
+        for (int i = 0; i < cardsValues.length; i++) {
+            sum += cardsValues[i].size();
+        }
+        return (sum != cards.size());
     }
 }

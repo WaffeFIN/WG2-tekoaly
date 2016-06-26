@@ -172,7 +172,7 @@ public class Card {
                 default:
                     c = (char) (value.toInt() + 48);
             }
-            return "" + suit.toString().charAt(0) + c;
+            return "" + c + suit.toString().charAt(0);
         }
     }
 
