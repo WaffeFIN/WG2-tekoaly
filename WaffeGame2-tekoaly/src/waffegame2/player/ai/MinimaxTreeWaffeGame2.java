@@ -5,10 +5,7 @@
  */
 package waffegame2.player.ai;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -18,7 +15,9 @@ import waffegame2.cardOwner.PileType;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 import waffegame2.util.Util;
+import waffegame2.util.WaffeList;
 import waffegame2.util.WaffeMap;
+import waffegame2.util.WaffeSet;
 
 /**
  * The minimax tree data structure used by the AI to score endgame positions.
@@ -69,15 +68,15 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             return;
         }
 
-        HashSet<Card> pileCards;
+        WaffeSet<Card> pileCards;
         if (pile == null || pile.isEmpty()) {
-            pileCards = new HashSet();
+            pileCards = new WaffeSet();
         } else {
             if (prwg2.checkType(pile) == PileTypeWaffeGame2.NULL) {
                 Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Invalid piletype"));
                 return;
             }
-            pileCards = new HashSet(pile);
+            pileCards = new WaffeSet(pile);
         }
 
         calculations = 0;
@@ -87,7 +86,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         nodeMap.clear();
         initStateConverter(maxCards, minCards, pileCards);
 
-        root = new MinimaxNode(0, 0, new HashSet(maxCards), new HashSet(minCards), pileCards);
+        root = new MinimaxNode(0, 0, new WaffeSet(maxCards), new WaffeSet(minCards), pileCards);
         root.value = minimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
@@ -127,7 +126,6 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 return Integer.MAX_VALUE;
             }
         }
-
         if (addPreExistingSuccessors(node)) {
             return node.value;
         }
@@ -190,7 +188,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         if (node.getNodePlayingCards().isEmpty()) {
             return true;
         }
-        HashSet<Card> play = new HashSet(node.pileCards);
+        WaffeSet<Card> play = new WaffeSet(node.pileCards);
         play.addAll(node.getNodePlayingCards());
 
         return (prwg2.checkType(play) != PileTypeWaffeGame2.NULL);
@@ -210,7 +208,6 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 //we know the playing cards and pile cards match
                 //but opponents' cards must differ
                 if (!sibling.isLeafNode()) { //leaf nodes lack children
-//                    node.successors.clear();
                     if (node.isMinNode()) {
                         for (MinimaxNode nibling : sibling.successors) {
                             if (nibling.isMinNode()) {
@@ -298,7 +295,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     @Override
     public List<Card> findBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
         if (pileCards == null) {
-            pileCards = new HashSet();
+            pileCards = new WaffeSet();
         }
         MinimaxNode node = findNode(cards, opponentsCards, pileCards);
         if (node == null) {
@@ -310,11 +307,11 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             }
         }
         if (node.bestSuccessor.pileCards.isEmpty()) {
-            return new ArrayList();
+            return new WaffeList();
         } else {
-            HashSet<Card> play = new HashSet(node.bestSuccessor.pileCards);
+            WaffeSet<Card> play = new WaffeSet(node.bestSuccessor.pileCards);
             play.removeAll(node.pileCards);
-            return new ArrayList(play);
+            return new WaffeList(play);
         }
     }
 
@@ -369,7 +366,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     @Override
     public int estimateScore(Collection<Card> cards, Collection<Card> oCards, Collection<Card> pileCards) {
         if (pileCards == null) {
-            pileCards = new HashSet();
+            pileCards = new WaffeSet();
         }
 
         int firstMoveAdvantage = 400;

@@ -7,6 +7,7 @@ package waffegame2.util;
 
 import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,14 +18,22 @@ public class WaffeList<E> extends AbstractList<E> implements List<E> {
 
     private int size;
     private Object[] array;
+    private final static int minimumCapacity = 8;
 
     public WaffeList() {
-        this(8);
+        this(minimumCapacity);
     }
 
     public WaffeList(int initialSize) {
+        if (initialSize < minimumCapacity)
+            initialSize = minimumCapacity;
         array = new Object[initialSize];
         size = 0;
+    }
+    
+    public WaffeList(Collection<? extends E> c) {
+        this(c.size());
+        addAll(c);
     }
 
     @Override

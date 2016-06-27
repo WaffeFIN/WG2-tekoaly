@@ -5,19 +5,18 @@
  */
 package waffegame2.player.ai;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 import waffegame2.card.Card;
 import waffegame2.card.CardValueComparator;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 import waffegame2.util.Util;
-import waffegame2.util.WaffeMap;
+import waffegame2.util.WaffeList;
+import waffegame2.util.WaffeSet;
 
 /**
  *
@@ -28,55 +27,38 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        final int softLimit = 4000000;
-        final PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
-//
-//        List<Card> myCards = new ArrayList();
-//        myCards.add(new Card(Card.Value.QUEEN, Card.Suit.HEARTS));
-//        myCards.add(new Card(Card.Value.JACK, Card.Suit.SPADES));
-//        myCards.add(new Card(Card.Value.SIX, Card.Suit.HEARTS));
-//        myCards.add(new Card(Card.Value.FIVE, Card.Suit.DIAMONDS));
-//        myCards.add(new Card(Card.Value.FOUR, Card.Suit.DIAMONDS));
-//        myCards.add(new Card(Card.Value.EIGHT, Card.Suit.CLUBS));
-//        myCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
-//        List<Card> othersCards = new ArrayList();
-//        othersCards.add(new Card(Card.Value.ACE, Card.Suit.SPADES));
-//        othersCards.add(new Card(Card.Value.EIGHT, Card.Suit.SPADES));
-//        othersCards.add(new Card(Card.Value.SEVEN, Card.Suit.SPADES));
-//
-//        MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2, softLimit);
-//        tree.generateTree(myCards, othersCards, null);
-//        
-//        printMoveSeq(tree.root);
+    static final int DEFAULT_LIMIT = 4000000;
 
-//        estimationTestSetBig(softLimit);
-        
-        if (true) {
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Welcome to the WaffeGame2.3 endgame AI demo. AI version: 1.0a\n\nAuthor: Walter Grönholm\n\n");
-            loop:
-            while (true) {
-                switch (menu(sc)) {
-                    case -1:
-                        break;
-                    case -2:
-                        break loop;
-                    case 0:
-                        printHelp(sc);
-                        break;
-                    case 1:
-                        analyse(sc, prwg2, softLimit);
-                        break;
-                    case 2:
-                        play(sc, prwg2, softLimit, true);
-                        break;
-                    case 3:
-                        play(sc, prwg2, softLimit, false);
-                        break;
-                    default:
-                        break;
-                }
+    public static void main(String[] args) {
+        int softLimit = DEFAULT_LIMIT;
+        final PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
+
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Welcome to the WaffeGame2.3 endgame AI demo. AI version: 1.0a\n\nAuthor: Walter Grönholm\n\n");
+        loop:
+        while (true) {
+            switch (menu(sc)) {
+                case -1:
+                    break;
+                case -2:
+                    break loop;
+                case 0:
+                    printHelp(sc);
+                    break;
+                case 9:
+                    softLimit = changeLimit(softLimit, sc);
+                    break;
+                case 1:
+                    analyse(sc, prwg2, softLimit);
+                    break;
+                case 2:
+                    play(sc, prwg2, softLimit, true);
+                    break;
+                case 3:
+                    play(sc, prwg2, softLimit, false);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -87,6 +69,7 @@ public class Main {
         System.out.println("[1]\tCalculate winning line (Analysis)");
         System.out.println("[2]\tPlay vs computer");
         System.out.println("[3]\tSpectate computer vs computer");
+        System.out.println("[9]\tSetting(s)");
         System.out.println("[0]\tHelp");
         System.out.println("[X]\tExit");
         System.out.println("");
@@ -122,7 +105,7 @@ public class Main {
     }
 
     private static void play(Scanner sc, PileRuleWaffeGame2 prwg2, int softLimit, boolean control) {
-        
+
         return; //:D
     }
 
@@ -179,11 +162,11 @@ public class Main {
 
     private static List<Card> getCardsFromStrings(String str) {
         if (str.isEmpty()) {
-            return new ArrayList();
+            return new WaffeList();
         }
         str = str.toUpperCase();
         String[] strs = str.split(" ");
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         for (String s : strs) {
             if (s.isEmpty()) {
                 continue;
@@ -207,7 +190,7 @@ public class Main {
                 if (Util.isInteger(s)) {
                     int n = Integer.parseInt(s);
                     Random r = new Random();
-                    Collection<Card> subList = new ArrayList();
+                    Collection<Card> subList = new WaffeList();
                     for (int i = 0; i < n; i++) {
                         subList.add(new Card(
                                 Card.Value.values()[1 + r.nextInt(13)],
@@ -258,7 +241,7 @@ public class Main {
             default:
                 suit = 1;
         }
-        Collection<Card> rv = new ArrayList();
+        Collection<Card> rv = new WaffeList();
         rv.add(new Card(Card.Value.values()[value], Card.Suit.values()[suit]));
         return rv; //:D
     }
@@ -278,7 +261,7 @@ public class Main {
         } else {
             if (node.value == Integer.MAX_VALUE || node.value == Integer.MIN_VALUE) {
                 printMovePrefix(node.isMinNode());
-                List<Card> list = new ArrayList(node.pileCards);
+                List<Card> list = new WaffeList(node.pileCards);
                 list.addAll(node.getNodePlayingCards());
                 printCards(list);
             } else {
@@ -313,7 +296,7 @@ public class Main {
     }
 
     private static List<Card> cardSet1() {//Two suits
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         cards.add(new Card(Card.Value.ACE, Card.Suit.CLUBS));
         cards.add(new Card(Card.Value.JACK, Card.Suit.CLUBS));
         cards.add(new Card(Card.Value.TEN, Card.Suit.SPADES));
@@ -324,7 +307,7 @@ public class Main {
     }
 
     private static List<Card> cardSet2() {//Dominant suit
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         cards.add(new Card(Card.Value.QUEEN, Card.Suit.DIAMONDS));
         cards.add(new Card(Card.Value.NINE, Card.Suit.HEARTS));
         cards.add(new Card(Card.Value.SEVEN, Card.Suit.DIAMONDS));
@@ -336,7 +319,7 @@ public class Main {
     }
 
     private static List<Card> cardSet3() {//Almost Pairs
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         cards.add(new Card(Card.Value.EIGHT, Card.Suit.SPADES));
         cards.add(new Card(Card.Value.EIGHT, Card.Suit.CLUBS));
         cards.add(new Card(Card.Value.SIX, Card.Suit.SPADES));
@@ -348,7 +331,7 @@ public class Main {
     }
 
     private static List<Card> cardSet4() {//Almost straight
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         cards.add(new Card(Card.Value.ACE, Card.Suit.HEARTS));
         cards.add(new Card(Card.Value.KING, Card.Suit.DIAMONDS));
         cards.add(new Card(Card.Value.QUEEN, Card.Suit.CLUBS));
@@ -360,7 +343,7 @@ public class Main {
     }
 
     private static List<Card> cardSet5() {//Almost pairs
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         cards.add(new Card(Card.Value.KING, Card.Suit.SPADES));
         cards.add(new Card(Card.Value.KING, Card.Suit.CLUBS));
         cards.add(new Card(Card.Value.FIVE, Card.Suit.HEARTS));
@@ -373,7 +356,7 @@ public class Main {
     }
 
     private static List<Card> cardSet6() {//Almost straight
-        List<Card> cards = new ArrayList();
+        List<Card> cards = new WaffeList();
         cards.add(new Card(Card.Value.ACE, Card.Suit.SPADES));
         cards.add(new Card(Card.Value.KING, Card.Suit.HEARTS));
         cards.add(new Card(Card.Value.QUEEN, Card.Suit.SPADES));
@@ -396,7 +379,7 @@ public class Main {
         PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
         for (int i = 1; i < 6; i++) {
             for (int k = i + 1; k < 7; k++) {
-                List<Card> myCards = new ArrayList();
+                List<Card> myCards = new WaffeList();
                 myCards.addAll(getCardSet(i));
                 myCards.addAll(getCardSet(k));
                 for (int j = 1; j < 6; j++) {
@@ -406,7 +389,7 @@ public class Main {
                             System.out.println("Test: Sets #" + i + " & #" + k + " vs Sets #" + j + " & #" + m);
                             MinimaxTreeWaffeGame2 tree = new MinimaxTreeWaffeGame2(prwg2, limit);
 
-                            List<Card> othersCards = new ArrayList();
+                            List<Card> othersCards = new WaffeList();
                             othersCards.addAll(getCardSet(j));
                             othersCards.addAll(getCardSet(m));
 
@@ -457,7 +440,7 @@ public class Main {
         PileRuleWaffeGame2 prwg2 = new PileRuleWaffeGame2();
 
         for (int i = 0; i < n; i++) {
-            List<Card> pack = new ArrayList();
+            List<Card> pack = new WaffeList();
             for (Card.Suit suit : Card.Suit.values()) {
                 if (suit != Card.Suit.JOKER) {
                     for (Card.Value value : Card.Value.values()) {
@@ -511,7 +494,7 @@ public class Main {
     }
 
     private static List<Card> getPack() {
-        List<Card> pack = new ArrayList();
+        List<Card> pack = new WaffeList();
         for (Card.Suit suit : Card.Suit.values()) {
             if (suit != Card.Suit.JOKER) {
                 for (Card.Value value : Card.Value.values()) {
@@ -528,6 +511,32 @@ public class Main {
     private static void enterToContinue(Scanner sc) {
         System.out.println("\nPress <Enter> to continue");
         sc.nextLine();
+    }
+
+    private static int changeLimit(int softLimit, Scanner sc) {
+        if (softLimit == DEFAULT_LIMIT) {
+            System.out.println("Enter the soft limit (currently: " + softLimit + ")");
+        } else {
+            System.out.println("Enter the soft limit (currently: " + softLimit + ", default: " + DEFAULT_LIMIT + ")");
+        }
+        while (true) {
+            String str = sc.nextLine();
+            if (str.isEmpty()) {
+                return softLimit;
+            }
+            if (!Util.isInteger(str)) {
+                System.out.println("Please enter a number. Enter an empty string to cancel");
+                continue;
+            }
+            int n = Integer.parseInt(str);
+            if (n < 1000) {
+                n = 1000;
+            } else if (n > 9999999) {
+                System.out.println("Warning! The limit you entered might make the program run out of memory!");
+                enterToContinue(sc);
+            }
+            return n;
+        }
     }
 
 }

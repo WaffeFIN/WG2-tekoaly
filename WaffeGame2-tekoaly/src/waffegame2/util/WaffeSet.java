@@ -25,6 +25,11 @@ public class WaffeSet<E> implements Set<E> {
     public WaffeSet(int capacity) {
         map = new WaffeMap(capacity);
     }
+    
+    public WaffeSet(Collection<? extends E> c) {
+        map = new WaffeMap(c.size());
+        addAll(c);
+    }
 
     public boolean add(E e) {
         if (map.containsKey(e)) {
@@ -47,21 +52,6 @@ public class WaffeSet<E> implements Set<E> {
     @Override
     public boolean contains(Object o) {
         return map.containsKey(o); //:D
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Object[] toArray() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -98,11 +88,6 @@ public class WaffeSet<E> implements Set<E> {
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean removeAll(Collection<?> c) {
         boolean rv = false;
         for (Object c1 : c) {
@@ -116,6 +101,26 @@ public class WaffeSet<E> implements Set<E> {
     @Override
     public void clear() {
         map.clear();
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return map.keyIterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
     }
 
     private static class Dummy {

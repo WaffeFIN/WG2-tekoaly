@@ -123,6 +123,13 @@ public class WaffeListTests {
             n++;
         }
         assertEquals(n, list.size());
+        
+        List<Dummy> list2 = new WaffeList();
+        for (int i = 0; i < 10; i++) {
+            list2.add(new Dummy());
+        }
+        list.addAll(list2);
+        assertEquals(30, list.size());
     }
 
     @Test

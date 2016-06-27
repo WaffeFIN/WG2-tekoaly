@@ -5,17 +5,18 @@
  */
 package waffegame2.player.ai;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 import waffegame2.util.Util;
+import waffegame2.util.WaffeList;
+import waffegame2.util.WaffeSet;
 
 /**
  * Calculates all possible successors to MinimaxNode.
@@ -45,7 +46,7 @@ public class SuccessorFinderWaffeGame2 {
         }
 
         Collection<Card> cards = node.getNodePlayingCards();
-        List<MinimaxNode> rv = new ArrayList();
+        List<MinimaxNode> rv = new WaffeList();
 
         List<Card>[] cardsValues = Util.getValueListArray(cards);
         List<Card>[] pileValues = Util.getValueListArray(pileCards);
@@ -85,19 +86,16 @@ public class SuccessorFinderWaffeGame2 {
                 break;
         }
 
+        if (rv.isEmpty()) {
+            rv.add(createNewSuccessor(node, null));                    
+            return rv;
+        }
         if (rv.size() > maxSuccessors) {
             Collections.shuffle(rv);
             rv = rv.subList(0, maxSuccessors);
-            Collections.sort(rv, new MinimaxNodePlayComparator());
-            return rv;
-        } else {
-            if (rv.isEmpty()) {
-                rv.add(createNewSuccessor(node, null));
-            } else {
-                Collections.sort(rv, new MinimaxNodePlayComparator());
-            }
-            return rv;
         }
+        Collections.sort(rv, new MinimaxNodePlayComparator());
+        return rv;
     }
 
     private static void addAllStraights(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues) {
@@ -110,10 +108,10 @@ public class SuccessorFinderWaffeGame2 {
         if (cards.size() + pileCards.size() < 13 * cycles) {
             return;
         }
-        List<Collection<Card>> holes = new ArrayList();
+        List<Collection<Card>> holes = new WaffeList();
         List<Card>[] cardsValues = Util.getValueListArray(cards);
 
-        holes.add(new HashSet());
+        holes.add(new WaffeSet());
         boolean foundBrokenHole = false;
         boolean skipCurrentHole = true;
         for (int n = 1; true; n++) {
@@ -148,7 +146,7 @@ public class SuccessorFinderWaffeGame2 {
                     break;
                 }
                 if (!holes.get(holes.size() - 1).isEmpty()) {
-                    holes.add(new HashSet());
+                    holes.add(new WaffeSet());
                 }
             }
         }
@@ -163,17 +161,17 @@ public class SuccessorFinderWaffeGame2 {
             return;
         }
         if (foundBrokenHole) {
-            Collection<Card> transformCards = new HashSet();
+            Collection<Card> transformCards = new WaffeSet();
             for (Collection<Card> hole : holes) {
                 transformCards.addAll(hole);
             }
             straightTransform2(node, rv, transformCards);
         } else {
-            List<Collection<Card>> transformCardsList = new ArrayList();
+            List<Collection<Card>> transformCardsList = new WaffeList();
             for (int i = 0; i < holes.size(); i++) {
-                transformCardsList.add(new HashSet());
+                transformCardsList.add(new WaffeSet());
             }
-            transformCardsList.add(new HashSet());
+            transformCardsList.add(new WaffeSet());
             for (int i = 0; i < holes.size(); i++) {
                 Collection<Card> hole = holes.get(i);
                 for (int j = 0; j < transformCardsList.size(); j++) {
@@ -252,7 +250,7 @@ public class SuccessorFinderWaffeGame2 {
     }
 
     private static void continueStraightDir(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, int d, int start, boolean ignoreOneSized) {
-        Collection<Card> play = new HashSet();
+        Collection<Card> play = new WaffeSet();
         int cycle = 0;
         int n = start;
         for (; true; n += d) {
@@ -281,7 +279,7 @@ public class SuccessorFinderWaffeGame2 {
     }
 
     private static void groupTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues, int groupSize) {
-        Collection<Card> transformCards = new ArrayList();
+        Collection<Card> transformCards = new WaffeList();
 
         //Make transform node
         for (int j = 1; j < pileValues.length; j++) {
@@ -325,7 +323,7 @@ public class SuccessorFinderWaffeGame2 {
             int cardsCountValue = cardsValues[i].size();
             int pileCountValue = pileValues[i].size();
             if (pileCountValue == 0 && cardsCountValue == groupSize) {
-                Collection<Card> play = new HashSet();
+                Collection<Card> play = new WaffeSet();
                 play.addAll(cardsValues[i]);
                 rv.add(createNewSuccessor(node, play));
             }
@@ -336,7 +334,7 @@ public class SuccessorFinderWaffeGame2 {
         if (suit == 0) {
             List<Card>[] suits = new List[4];
             for (int i = 0; i < suits.length; i++) {
-                suits[i] = new ArrayList();
+                suits[i] = new WaffeList();
             }
             for (Card card : cards) {
                 if (!card.isJoker()) {
@@ -347,7 +345,7 @@ public class SuccessorFinderWaffeGame2 {
                 addSuitPermutations(node, rv, suits[i]);
             }
         } else {
-            List<Card> cardsOfSuit = new ArrayList();
+            List<Card> cardsOfSuit = new WaffeList();
             for (Card card : cards) {
                 if (card.getSuit().toInt() == suit) {
                     cardsOfSuit.add(card);
@@ -362,14 +360,14 @@ public class SuccessorFinderWaffeGame2 {
             return;
         }
         if (cardsOfSuit.size() <= 4 || 1 << (cardsOfSuit.size() + 1) < maxSuccessors - rv.size()) { //full check, 2^N
-            List<Collection<Card>> plays = new ArrayList();
+            List<Collection<Card>> plays = new WaffeList();
             addSuitPermutation(plays, cardsOfSuit, 0);
             for (Collection<Card> play : plays) {
                 rv.add(createNewSuccessor(node, play));
             }
         } else { //fast check, N^2
             for (int i = 0; i < cardsOfSuit.size(); i++) {
-                Collection<Card> play = new HashSet();
+                Collection<Card> play = new WaffeSet();
                 for (int j = i; j < cardsOfSuit.size(); j++) {
                     play.add(cardsOfSuit.get(j));
                 }
@@ -382,11 +380,11 @@ public class SuccessorFinderWaffeGame2 {
         if (i < cardsOfSuit.size()) {
             int size = plays.size();
             for (int j = 0; j < size; j++) {
-                Collection<Card> newPlay = new HashSet(plays.get(j));
+                Collection<Card> newPlay = new WaffeSet(plays.get(j));
                 newPlay.add(cardsOfSuit.get(i));
                 plays.add(newPlay);
             }
-            Collection<Card> newPlay = new HashSet();
+            Collection<Card> newPlay = new WaffeSet();
             newPlay.add(cardsOfSuit.get(i));
             plays.add(newPlay);
             addSuitPermutation(plays, cardsOfSuit, i + 1);
@@ -395,26 +393,26 @@ public class SuccessorFinderWaffeGame2 {
 
     private static void addAllSingles(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards) {
         for (Card card : cards) {
-            Collection<Card> play = new HashSet();
+            Collection<Card> play = new WaffeSet();
             play.add(card);
             rv.add(createNewSuccessor(node, play));
         }
     }
 
     private static MinimaxNode createNewSuccessor(MinimaxNode parent, Collection<Card> play) {
-        HashSet<Card> maxCards = parent.maxCards;
-        HashSet<Card> minCards = parent.minCards;
-        HashSet<Card> pileCards;
+        Set<Card> maxCards = parent.maxCards;
+        Set<Card> minCards = parent.minCards;
+        Set<Card> pileCards;
 
         if (play == null) {
-            pileCards = new HashSet();
+            pileCards = new WaffeSet();
         } else {
-            pileCards = new HashSet(parent.pileCards);
+            pileCards = new WaffeSet(parent.pileCards);
             if (parent.isMinNode()) {
-                minCards = new HashSet(parent.minCards);
+                minCards = new WaffeSet(parent.minCards);
                 transferCards(play, minCards, pileCards);
             } else {
-                maxCards = new HashSet(parent.maxCards);
+                maxCards = new WaffeSet(parent.maxCards);
                 transferCards(play, maxCards, pileCards);
             }
         }

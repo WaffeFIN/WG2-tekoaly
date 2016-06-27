@@ -7,9 +7,9 @@ package waffegame2.player.ai;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import waffegame2.card.Card;
 
 /**
@@ -22,14 +22,14 @@ public class MinimaxNode {
     int value;
     int depth;
 
-    HashSet<Card> maxCards;
-    HashSet<Card> minCards;
-    HashSet<Card> pileCards;
+    Set<Card> maxCards;
+    Set<Card> minCards;
+    Set<Card> pileCards;
 
     List<MinimaxNode> successors;
     MinimaxNode bestSuccessor;
 
-    public MinimaxNode(int value, int depth, HashSet<Card> maxCards, HashSet<Card> minCards, HashSet<Card> pileCards) {
+    public MinimaxNode(int value, int depth, Set<Card> maxCards, Set<Card> minCards, Set<Card> pileCards) {
         this.value = value;
         this.depth = depth;
         this.maxCards = maxCards;

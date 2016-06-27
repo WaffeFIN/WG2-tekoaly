@@ -15,11 +15,11 @@ import org.junit.Test;
  *
  * @author Walter
  */
-public class WaffeMapAndSetTests {
+public class WaffeMapTests {
 
     private Map<Dummy1, Dummy2> map;
 
-    public WaffeMapAndSetTests() {
+    public WaffeMapTests() {
     }
 
     @Before
@@ -149,15 +149,21 @@ public class WaffeMapAndSetTests {
 
     @Test
     public void testBigAdditionTimeComparison() {
-        int testSize = 200000;
+        int testSize = 400000;
 
-        Map<Dummy1, Dummy2> hashMap = new HashMap(27);
-        Map<Dummy1, Dummy2> map = new WaffeMap(27);
+        Map<Dummy1, Dummy2> hashMap = new HashMap();
+        Map<Dummy1, Dummy2> map = new WaffeMap();
 
         long l1;
         long l2;
         long l3;
 
+        //WARMUP
+        for (int j = 0; j < 3; j++) {
+            bigPutTestInit(testSize, hashMap);
+            hashMap.clear();
+        }
+        //Actual test
         l1 = System.nanoTime();
         for (int j = 0; j < 3; j++) {
             bigPutTestInit(testSize, hashMap);
@@ -172,9 +178,15 @@ public class WaffeMapAndSetTests {
         }
         l3 = System.nanoTime();
         System.out.println(".put HashMap performance:  " + (l2 - l1) / 1000 + "\n.put WaffeMap performance: " + (l3 - l2) / 1000);
+        System.out.println("");
+        //WARMUP
+        for (int j = 0; j < 3; j++) {
+            bigPutTestInit(testSize, hashMap);
+            hashMap.clear();
+        }
         bigPutTestInit(testSize, hashMap);
         bigPutTestInit(testSize, map);
-        System.out.println("");
+        //Actual test
         l1 = System.nanoTime();
         for (int j = 0; j < 3; j++) {
             bigGetTest(testSize, hashMap);

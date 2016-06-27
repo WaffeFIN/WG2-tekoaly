@@ -14,6 +14,7 @@ Taulukon luonti on PALJON hitaampaa kuin taulukon tyhjentäminen
 
 #### Mikä jäi epäselväksi tai tuottanut vaikeuksia?
 
+Iteraattorin luominen (WaffeMap:le) oli jostain syystä haastavaa. 
 
 #### Mitä teen seuraavaksi?
 

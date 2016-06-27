@@ -6,6 +6,7 @@
 package waffegame2.util;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,14 +19,18 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
     private int size;
     private int maximumBeforeResize;
     private WaffeEntry<K, V>[] array;
-    private final static int initialCapacity = 9;
+
+    private final static int minimumCapacity = 9;
     private float loadingFactor = 0.75f;
 
     public WaffeMap() {
-        this(initialCapacity);
+        this(minimumCapacity);
     }
 
     public WaffeMap(int capacity) {
+        if (capacity < minimumCapacity) {
+            capacity = minimumCapacity;
+        }
         array = (WaffeEntry<K, V>[]) new WaffeEntry[capacity];
         maximumBeforeResize = (int) (capacity / loadingFactor);
     }
@@ -78,11 +83,12 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
                     node = node.next;
                 }
             }
-            node.next = new WaffeEntry(key.hashCode(), key, value);
+            WaffeEntry<K, V> e = new WaffeEntry(key, value);
+            node.next = e;
             size++;
             return node.value;
         }
-        array[index] = new WaffeEntry(key.hashCode(), key, value);
+        array[index] = new WaffeEntry(key, value);
         size++;
         if (size > maximumBeforeResize) {
             resize();
@@ -156,6 +162,19 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         }
     }
 
+    public Iterator<K> keyIterator() {
+        return new keyIterator();
+    }
+
+    public Iterator<V> valueIterator() {
+        return new valueIterator();
+    }
+
+    @Override
+    public Set<K> keySet() {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Set<Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException();
@@ -184,24 +203,17 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
     }
 
     @Override
-    public Set<K> keySet() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Collection<V> values() {
         throw new UnsupportedOperationException();
     }
 
     public static class WaffeEntry<K, V> implements Entry<K, V> {
 
-        int hash;
         K key;
         V value;
         WaffeEntry<K, V> next;
 
-        public WaffeEntry(int hash, K key, V value) {
-            this.hash = hash;
+        public WaffeEntry(K key, V value) {
             this.key = key;
             this.value = value;
         }
@@ -224,4 +236,52 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         }
     }
 
+    class keyIterator extends abstractIterator implements Iterator<K> {
+
+        @Override
+        public K next() {
+            return nextNode().key;
+        }
+    }
+
+    class valueIterator extends abstractIterator implements Iterator<V> {
+
+        @Override
+        public V next() {
+            return nextNode().value;
+        }
+    }
+
+    abstract class abstractIterator {
+
+        int index;
+        WaffeEntry<K, V> next;
+        WaffeEntry<K, V>[] a;
+
+        abstractIterator() {
+            index = 0;
+            a = (WaffeEntry<K, V>[]) array;
+            nextNode();
+        }
+
+        public boolean hasNext() {
+            return next != null;
+        }
+
+        public final WaffeEntry<K, V> nextNode() {
+            WaffeEntry<K, V> current = next;
+            if (next != null) {
+                next = next.next;
+            }
+
+            while (next == null) {
+                if (index >= array.length) {
+                    break;
+                }
+                next = a[index]; //TODO
+                index++;
+            }
+            return current;
+        }
+    }
 }
