@@ -18,7 +18,7 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
     private int size;
     private int maximumBeforeResize;
     private WaffeEntry<K, V>[] array;
-    private final static int initialCapacity = 16;
+    private final static int initialCapacity = 9;
     private float loadingFactor = 0.75f;
 
     public WaffeMap() {
@@ -37,7 +37,22 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
     }
 
     private void resize() {
-        maximumBeforeResize *= 2;
+        WaffeEntry<K, V>[] oldArray = array;
+        array = (WaffeEntry<K, V>[]) new WaffeEntry[oldArray.length * 3];
+        maximumBeforeResize = (int) (array.length / loadingFactor);
+        size = 0;
+
+        for (int i = 0; i < oldArray.length; i++) {
+            WaffeEntry<K, V> e = oldArray[i];
+            if (e == null) {
+                continue;
+            }
+            put(e.key, e.value);
+            while (e.next != null) {
+                e = e.next;
+                put(e.key, e.value);
+            }
+        }
     }
 
     @Override
@@ -51,27 +66,27 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         if (array[index] != null) {
             WaffeEntry<K, V> node = array[index];
             if (node.key == key) {
-                array[index] = new WaffeEntry(key.hashCode(), key, value);
-                return node.value;
+                V rv = node.value;
+                node.value = value;
+                return rv;
             }
             while (node.next != null) {
                 if (node.next.key == key) {
-                    size--;
                     node.next = node.next.next;
+                    size--;
                 } else {
                     node = node.next;
                 }
             }
-            WaffeEntry<K, V> newNode = new WaffeEntry(key.hashCode(), key, value);
-            node.next = newNode;
+            node.next = new WaffeEntry(key.hashCode(), key, value);
             size++;
             return node.value;
         }
         array[index] = new WaffeEntry(key.hashCode(), key, value);
+        size++;
         if (size > maximumBeforeResize) {
             resize();
         }
-        size++;
         return null;
     }
 
@@ -79,9 +94,16 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         if (key == null) {
             return 0;
         }
-        int h = key.hashCode();
+        return hash(key.hashCode());
+    }
+
+    private int hash(int h) {
         h = h ^ (h >>> 16);
-        return (h) % array.length;
+        h = h % array.length;
+        if (h < 0) {
+            h += array.length;
+        }
+        return h;
     }
 
     @Override
@@ -114,9 +136,10 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         }
         while (node.next != null) {
             if (node.next.key.equals(key)) {
+                V rv = node.next.value;
                 node.next = node.next.next;
                 size--;
-                return node.next.value;
+                return rv;
             }
             node = node.next;
         }
@@ -125,20 +148,17 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
 
     @Override
     public void clear() {
-        if (size != 0) {
-            array = (WaffeEntry<K, V>[]) new WaffeEntry[initialCapacity];
+        if (size > 0) {
             size = 0;
+            for (int i = 0; i < array.length; i++) {
+                array[i] = null;
+            }
         }
     }
 
     @Override
     public Set<Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException();
-//        for (int i = 0; i < array.length; i++) {
-//            Node<K, V> node = array[i];
-//            while(node != null) {
-//            }
-//        }
     }
 
     @Override
@@ -173,7 +193,7 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         throw new UnsupportedOperationException();
     }
 
-    private static class WaffeEntry<K, V> implements Entry<K, V> {
+    public static class WaffeEntry<K, V> implements Entry<K, V> {
 
         int hash;
         K key;

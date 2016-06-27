@@ -95,16 +95,16 @@ public class WaffeMapAndSetTests {
         map.put(d15, new Dummy2(5));
         map.put(d16, new Dummy2(6));
         assertEquals(6, map.size());
-        
+
         assertEquals(6, map.get(d16).value);
         assertEquals(1, map.get(d11).value);
         assertEquals(3, map.get(d13).value);
         assertEquals(null, map.get(d17));
-        
+
         assertEquals(6, map.size());
         assertEquals(5, map.remove(d15).value);
         assertEquals(5, map.size());
-        
+
         map.clear();
         assertEquals(0, map.size());
         map.remove(d11);
@@ -116,50 +116,88 @@ public class WaffeMapAndSetTests {
         assertEquals(0, map.size());
     }
 
-//    @Test
-//    public void testContainsContainsAll() {
-//        WaffeListTests.Dummy d = new WaffeListTests.Dummy();
-//        list.add(d);
-//        for (int i = 0; i < 6; i++) {
-//            list.add(new WaffeListTests.Dummy());
-//        }
-//        List<WaffeListTests.Dummy> arrayList = new ArrayList();
-//        for (int i = 0; i < 10; i++) {
-//            arrayList.add(new WaffeListTests.Dummy());
-//        }
-//        list.addAll(arrayList);
-//
-//        assertEquals(true, list.contains(d));
-//        assertEquals(true, list.containsAll(arrayList));
-//
-//        arrayList.add(new WaffeListTests.Dummy());
-//        assertEquals(false, list.containsAll(arrayList));
-//        list.remove(d);
-//        assertEquals(false, list.contains(d));
-//    }
-//
-//    @Test
-//    public void testIteration() {
-//        for (int i = 0; i < 20; i++) {
-//            list.add(new WaffeListTests.Dummy());
-//        }
-//        int n = 0;
-//        for (WaffeListTests.Dummy dummy : list) {
-//            n++;
-//        }
-//        assertEquals(n, list.size());
-//    }
-//
-//    @Test
-//    public void testBigAddition() {
-//        for (int j = 0; j < 3; j++) {
-//            for (int i = 0; i < 25000; i++) {
-//                list.add(new WaffeListTests.Dummy());
-//            }
-//            assertEquals(25000, list.size());
-//            list.clear();
-//        }
-//    }
+    @Test
+    public void testContainsKey() {
+        HashMap<Dummy1, Dummy2> controlMap = new HashMap();
+
+        Dummy1 d11 = new Dummy1("H");
+        Dummy1 d12 = new Dummy1("He");
+        Dummy1 d13 = new Dummy1("Li");
+        Dummy1 d14 = new Dummy1("Be");
+        Dummy1 d15 = new Dummy1("B");
+        Dummy1 d16 = new Dummy1("C");
+        Dummy1 d17 = new Dummy1("N");
+
+        map.put(d11, new Dummy2(1));
+        map.put(d12, new Dummy2(2));
+        map.put(d13, new Dummy2(3));
+        map.put(d14, new Dummy2(9));
+        map.put(d15, new Dummy2(18));
+        map.put(d16, new Dummy2(27));
+
+        assertEquals(true, map.containsKey(d11));
+        assertEquals(true, map.containsKey(d12));
+        assertEquals(true, map.containsKey(d13));
+        assertEquals(true, map.containsKey(d14));
+        assertEquals(true, map.containsKey(d15));
+        assertEquals(true, map.containsKey(d16));
+        assertEquals(false, map.containsKey(d17));
+
+        map.put(d17, new Dummy2(27));
+        assertEquals(true, map.containsKey(d17));
+    }
+
+    @Test
+    public void testBigAdditionTimeComparison() {
+        int testSize = 200000;
+
+        Map<Dummy1, Dummy2> hashMap = new HashMap(27);
+        Map<Dummy1, Dummy2> map = new WaffeMap(27);
+
+        long l1;
+        long l2;
+        long l3;
+
+        l1 = System.nanoTime();
+        for (int j = 0; j < 3; j++) {
+            bigPutTestInit(testSize, hashMap);
+            assertEquals(testSize, hashMap.size());
+            hashMap.clear();
+        }
+        l2 = System.nanoTime();
+        for (int j = 0; j < 3; j++) {
+            bigPutTestInit(testSize, map);
+            assertEquals(testSize, map.size());
+            map.clear();
+        }
+        l3 = System.nanoTime();
+        System.out.println(".put HashMap performance:  " + (l2 - l1) / 1000 + "\n.put WaffeMap performance: " + (l3 - l2) / 1000);
+        bigPutTestInit(testSize, hashMap);
+        bigPutTestInit(testSize, map);
+        System.out.println("");
+        l1 = System.nanoTime();
+        for (int j = 0; j < 3; j++) {
+            bigGetTest(testSize, hashMap);
+        }
+        l2 = System.nanoTime();
+        for (int j = 0; j < 3; j++) {
+            bigGetTest(testSize, map);
+        }
+        l3 = System.nanoTime();
+        System.out.println(".get HashMap performance:  " + (l2 - l1) / 1000 + "\n.get WaffeMap performance: " + (l3 - l2) / 1000);
+    }
+
+    private void bigGetTest(int testSize, Map<Dummy1, Dummy2> map) {
+        for (int i = 0; i < testSize; i++) {
+            map.get(new Dummy1("" + i));
+        }
+    }
+
+    private void bigPutTestInit(int testSize, Map<Dummy1, Dummy2> map) {
+        for (int i = 0; i < testSize; i++) {
+            map.put(new Dummy1("" + i), new Dummy2(i));
+        }
+    }
 
     private static class Dummy1 {
 

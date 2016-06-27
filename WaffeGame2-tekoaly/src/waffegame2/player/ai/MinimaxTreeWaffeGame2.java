@@ -18,6 +18,7 @@ import waffegame2.cardOwner.PileType;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 import waffegame2.util.Util;
+import waffegame2.util.WaffeMap;
 
 /**
  * The minimax tree data structure used by the AI to score endgame positions.
@@ -47,8 +48,8 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     public MinimaxTreeWaffeGame2(PileRuleWaffeGame2 prwg2, int softCalculationLimit) {
         this.prwg2 = prwg2;
-        this.nodeMap = new HashMap(softCalculationLimit / 100);
-        this.stateConverter = new HashMap(64);
+        this.nodeMap = new WaffeMap(6561);
+        this.stateConverter = new WaffeMap(81);
         this.softCalculationLimit = softCalculationLimit;
     }
 

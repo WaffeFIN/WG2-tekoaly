@@ -8,14 +8,16 @@ package waffegame2.player.ai;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import waffegame2.card.Card;
 import waffegame2.card.CardValueComparator;
-import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
 import waffegame2.util.Util;
+import waffegame2.util.WaffeMap;
 
 /**
  *
@@ -49,6 +51,7 @@ public class Main {
 //        printMoveSeq(tree.root);
 
 //        estimationTestSetBig(softLimit);
+        
         if (true) {
             Scanner sc = new Scanner(System.in);
             System.out.println("Welcome to the WaffeGame2.3 endgame AI demo. AI version: 1.0a\n\nAuthor: Walter Grönholm\n\n");
