@@ -8,8 +8,6 @@ package waffegame2.player.ai;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.PileType;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
@@ -64,7 +62,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     @Override
     public void generateTree(Collection<Card> maxCards, Collection<Card> minCards, Collection<Card> pile) {
         if (maxCards.size() + minCards.size() >= 32) {
-            Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Too many cards for tree generation!"));
+            System.out.println("WARNING! Too many cards for tree generation!");
             return;
         }
 
@@ -73,10 +71,11 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
             pileCards = new WaffeSet();
         } else {
             if (prwg2.checkType(pile) == PileTypeWaffeGame2.NULL) {
-                Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Invalid piletype"));
-                return;
+                System.out.println("WARNING! Invalid pile type before generating tree");
+                pileCards = new WaffeSet();
+            } else {
+                pileCards = new WaffeSet(pile);
             }
-            pileCards = new WaffeSet(pile);
         }
 
         calculations = 0;
@@ -90,6 +89,10 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         root.value = minimax(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
+    /**
+     * Initializes the state converter, used to turn the three card sets into a
+     * single Long.
+     */
     private void initStateConverter(Collection<Card> maxCards, Collection<Card> minCards, Collection<Card> pile) {
         stateConverter.clear();
         pileCardStateShifter = maxCards.size() + minCards.size();
@@ -134,7 +137,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 return estimateScore(node);
             }
         }
-        if (node.successors.isEmpty()) {
+        if (node.successors == null || node.successors.isEmpty()) {
             node.successors = SuccessorFinderWaffeGame2.createSuccessors(node, prwg2.checkType(node.pileCards).toInt());
             nodes += node.successors.size();
         }
@@ -147,7 +150,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 if (successor.value == 0) {
                     successor.value = minimax(successor, alpha, beta);
                     if (nodeMap.get(convertStateToLong(successor)) != successor) {
-                        successor.successors.clear();
+                        successor.successors = null;
                     }
                 }
                 if (successor.value <= beta) {
@@ -165,7 +168,7 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 if (successor.value == 0) {
                     successor.value = minimax(successor, alpha, beta);
                     if (nodeMap.get(convertStateToLong(successor)) != successor) {
-                        successor.successors.clear();
+                        successor.successors = null;
                     }
                 }
                 if (successor.value >= alpha) {
@@ -194,6 +197,13 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         return (prwg2.checkType(play) != PileTypeWaffeGame2.NULL);
     }
 
+    /**
+     * Finds a sibling to a node. If a sibling is found, successors are added to
+     * the node.
+     *
+     * @param node Node to which to search siblings for
+     * @return true only if an identical node was found in the node map
+     */
     private boolean addPreExistingSuccessors(MinimaxNode node) {
         long state = convertStateToLong(node);
         MinimaxNode sibling = nodeMap.get(state);
@@ -205,42 +215,9 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 nodeClones++;
                 return true;
             } else {
-                //we know the playing cards and pile cards match
-                //but opponents' cards must differ
-                if (!sibling.isLeafNode()) { //leaf nodes lack children
-                    if (node.isMinNode()) {
-                        for (MinimaxNode nibling : sibling.successors) {
-                            if (nibling.isMinNode()) {
-                                continue;
-                            }
-                            Long l = convertStateToLong(node.maxCards, nibling.pileCards);
-                            if (nodeMap.containsKey(l)) {
-                                MinimaxNode child = nodeMap.get(l);
-                                if (equalSets(child.minCards, nibling.minCards)) {
-                                    node.successors.add(child);
-                                    continue;
-                                }
-                            }
-                            node.successors.add(new MinimaxNode(0, node.depth + 1, node.maxCards, nibling.minCards, nibling.pileCards));
-                            nodes++;
-                        }
-                    } else {
-                        for (MinimaxNode nibling : sibling.successors) {
-                            if (!nibling.isMinNode()) {
-                                continue;
-                            }
-                            Long l = convertStateToLong(node.minCards, nibling.pileCards);
-                            if (nodeMap.containsKey(l)) {
-                                MinimaxNode child = nodeMap.get(l);
-                                if (equalSets(child.maxCards, nibling.maxCards)) {
-                                    node.successors.add(child);
-                                    continue;
-                                }
-                            }
-                            node.successors.add(new MinimaxNode(0, node.depth + 1, nibling.maxCards, node.minCards, nibling.pileCards));
-                            nodes++;
-                        }
-                    }
+                if (!sibling.isLeafNode()) {
+                    node.successors = new WaffeList();
+                    addNodeNiblings(node, sibling);
                     nodeTwins++;
                     return false;
                 }
@@ -248,6 +225,47 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         }
         nodeMap.put(state, node);
         return false;
+    }
+
+    /**
+     * Adds all sibling's children (niblings) to the node.
+     */
+    private void addNodeNiblings(MinimaxNode node, MinimaxNode sibling) {
+        //we know the playing cards and pile cards match
+        //but opponents' cards must differ
+        if (node.isMinNode()) {
+            for (MinimaxNode nibling : sibling.successors) {
+                if (nibling.isMinNode()) {
+                    continue;
+                }
+                Long l = convertStateToLong(node.maxCards, nibling.pileCards);
+                if (nodeMap.containsKey(l)) {
+                    MinimaxNode child = nodeMap.get(l);
+                    if (equalSets(child.minCards, nibling.minCards)) {
+                        node.successors.add(child);
+                        continue;
+                    }
+                }
+                node.successors.add(new MinimaxNode(0, node.depth + 1, node.maxCards, nibling.minCards, nibling.pileCards));
+                nodes++;
+            }
+        } else {
+            for (MinimaxNode nibling : sibling.successors) {
+                if (!nibling.isMinNode()) {
+                    continue;
+                }
+                Long l = convertStateToLong(node.minCards, nibling.pileCards);
+                if (nodeMap.containsKey(l)) {
+                    MinimaxNode child = nodeMap.get(l);
+                    if (equalSets(child.maxCards, nibling.maxCards)) {
+                        node.successors.add(child);
+                        continue;
+                    }
+                }
+                node.successors.add(new MinimaxNode(0, node.depth + 1, nibling.maxCards, node.minCards, nibling.pileCards));
+                nodes++;
+            }
+        }
     }
 
     private boolean equalSets(Collection<Card> c1, Collection<Card> c2) {
@@ -261,6 +279,11 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         return convertStateToLong(node.getNodePlayingCards(), node.pileCards);
     }
 
+    /**
+     * Checks each card from the stateConverter and creates a long containing
+     * all the information of the game state
+     *
+     */
     private long convertStateToLong(Collection<Card> cards, Collection<Card> pile) {
         long rv = 0l;
         for (Card card : cards) {
@@ -294,17 +317,20 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      */
     @Override
     public List<Card> findBestMove(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
-        if (pileCards == null) {
-            pileCards = new WaffeSet();
+        if (root == null) {
+            generateTree(cards, opponentsCards, pileCards);
         }
         MinimaxNode node = findNode(cards, opponentsCards, pileCards);
         if (node == null) {
             generateTree(cards, opponentsCards, pileCards);
             node = root;
         } else {
-            if (false && node.value != Integer.MAX_VALUE && node.value != Integer.MIN_VALUE) {
-                continueMinimax(node);
+            if (node.value != Integer.MAX_VALUE && node.value != Integer.MIN_VALUE) {
+                generateTree(cards, opponentsCards, pileCards);
             }
+        }
+        if (node.bestSuccessor == null) {
+            return new WaffeList(node.getNodePlayingCards());
         }
         if (node.bestSuccessor.pileCards.isEmpty()) {
             return new WaffeList();
@@ -319,7 +345,12 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
      * Finds the node with the inputted game state
      */
     private MinimaxNode findNode(Collection<Card> cards1, Collection<Card> cards2, Collection<Card> pileCards) {
-        //find node in nodeMap
+        if (nodeMap == null) {
+            return null;
+        }
+        if (pileCards == null) {
+            pileCards = new WaffeSet();
+        }
         MinimaxNode node1 = nodeMap.get(convertStateToLong(cards1, pileCards));
         MinimaxNode node2 = nodeMap.get(convertStateToLong(cards2, pileCards));
 
@@ -338,15 +369,6 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         return null;
     }
 
-    /**
-     * YET TO BE IMPLEMENTED
-     *
-     * @param node
-     */
-    private void continueMinimax(MinimaxNode node) {
-        //fix parent values! recursively?
-    }
-
     private int estimateScore(MinimaxNode node) {
         if (node.isMinNode()) {
             return -estimateScore(node.getNodePlayingCards(), node.getNodeOpponentsCards(), node.pileCards);
@@ -356,15 +378,16 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
     }
 
     /**
-     * Estimates the score judging by hand size and pile type. Update this!
+     * Estimates the score judging by hand size and pile type. Remember to
+     * update this later!
      *
      * @param cards
-     * @param oCards opponent's cards
+     * @param opponentsCards
      * @param pileCards
-     * @return
+     * @return an estimate to over who's winning
      */
     @Override
-    public int estimateScore(Collection<Card> cards, Collection<Card> oCards, Collection<Card> pileCards) {
+    public int estimateScore(Collection<Card> cards, Collection<Card> opponentsCards, Collection<Card> pileCards) {
         if (pileCards == null) {
             pileCards = new WaffeSet();
         }
@@ -373,18 +396,18 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
 
         List<Card>[] cardsValues = Util.getValueListArray(cards);
         List<Card>[] cardsSuits = Util.getSuitListArray(cards);
-        List<Card>[] oCardsValues = Util.getValueListArray(oCards);
-        List<Card>[] oCardsSuits = Util.getSuitListArray(oCards);
+        List<Card>[] oCardsValues = Util.getValueListArray(opponentsCards);
+        List<Card>[] oCardsSuits = Util.getSuitListArray(opponentsCards);
 
         double Ac = getAttackScore(cards, cardsSuits, cardsValues);
         double Dc = getDefenceScore(cards, cardsSuits, cardsValues);
-        double Ao = getAttackScore(oCards, oCardsSuits, oCardsValues);
-        double Do = getDefenceScore(oCards, oCardsSuits, oCardsValues);
+        double Ao = getAttackScore(opponentsCards, oCardsSuits, oCardsValues);
+        double Do = getDefenceScore(opponentsCards, oCardsSuits, oCardsValues);
 
         double score;
         double P = getHittingProbability(cards.size(), pileCards.size(), prwg2.checkType(pileCards));
 
-        if (prwg2.checkType(oCards) == PileTypeWaffeGame2.NULL) {
+        if (prwg2.checkType(opponentsCards) == PileTypeWaffeGame2.NULL) {
             P = 2.0 * P - 1.0;
             score = (P + 1) * (Ac - Do) + (1 - P) * (Dc - Ao);
         } else {
@@ -398,9 +421,18 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
                 score = (P - 1) * Ao + (P + 1) * (Ac - Do);
             }
         }
-        return noZeroRounding(100.0 / (cards.size() + oCards.size() + 2) * (score + firstMoveAdvantage));
+        return noZeroRounding(100.0 / (cards.size() + opponentsCards.size() + 2) * (score + firstMoveAdvantage));
     }
 
+    /**
+     * Gives a rough estimate over the probability of you being able to hit the
+     * pile.
+     *
+     * @param K
+     * @param p
+     * @param type
+     * @return
+     */
     private double getHittingProbability(int K, int p, PileType type) {
         switch (type.toInt()) {
             case 1:
@@ -530,6 +562,9 @@ public class MinimaxTreeWaffeGame2 extends MinimaxTree {
         return ((uniqueValues + 1) / 13.0 * (suitSum / Math.sqrt(cards.size()) - 1) + Util.sqr(uniqueValues / 13.0)) * 1000.0;
     }
 
+    /**
+     * Rounds away from 0
+     */
     private int noZeroRounding(double d) {
         if (d == 0) {
             return -1;

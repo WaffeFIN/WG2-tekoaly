@@ -9,8 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import waffegame2.card.Card;
 import waffegame2.cardOwner.PileTypeWaffeGame2;
 import waffegame2.cardOwner.pileRules.PileRuleWaffeGame2;
@@ -31,18 +29,36 @@ public class SuccessorFinderWaffeGame2 {
     private static final int maxSuccessors = 200;
 
     /**
+     * Returns whether or not the specifies cards can hit on the pile
+     * @param cards
+     * @param pileCards
+     * @param pileType
+     * @return true if you are able to hit with the cards
+     */
+    public static boolean isAbleToHit(Collection<Card> cards, Collection<Card> pileCards, int pileType) {
+        MinimaxNode node = new MinimaxNode(0, 0, new WaffeSet(cards), new WaffeSet(), new WaffeSet(pileCards));
+        List<MinimaxNode> list = createSuccessors(node, pileType);
+        if (list.size() == 1) {
+            if (list.get(0).pileCards.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Creates a list of every single (or most of the) playable combination
      *
      * @param node the parent node
      * @param pileType
-     * @return
+     * @return list of successors
      */
     public static List<MinimaxNode> createSuccessors(MinimaxNode node, int pileType) {
         Collection<Card> pileCards = node.pileCards;
 
         if (pileCards.size() > 0 && pileType == PileTypeWaffeGame2.NULL.toInt()) {
-            Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Invalid piletype in node!"));
-            return null;
+            System.out.println("WARNING! Invalid piletype in node!");
+            return new WaffeList();
         }
 
         Collection<Card> cards = node.getNodePlayingCards();
@@ -87,7 +103,7 @@ public class SuccessorFinderWaffeGame2 {
         }
 
         if (rv.isEmpty()) {
-            rv.add(createNewSuccessor(node, null));                    
+            rv.add(createNewSuccessor(node, null));
             return rv;
         }
         if (rv.size() > maxSuccessors) {
@@ -104,6 +120,9 @@ public class SuccessorFinderWaffeGame2 {
         }
     }
 
+    /**
+     * Checks whether or not you can transform a suit or group combination into a straight
+     */
     private static void straightTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cV, Collection<Card> pileCards, List<Card>[] pileValues, int cycles) {
         if (cards.size() + pileCards.size() < 13 * cycles) {
             return;
@@ -135,7 +154,7 @@ public class SuccessorFinderWaffeGame2 {
                     }
                 } else {
                     for (int j = 0; j <= cycles - pileList.size(); j++) {
-                        holes.get(holes.size() - 1).add(cardsList.remove(0));//ERROR <========================
+                        holes.get(holes.size() - 1).add(cardsList.remove(0));
                     }
                 }
             } else {
@@ -191,10 +210,8 @@ public class SuccessorFinderWaffeGame2 {
         rv.add(transformNode);
 
         int type = new PileRuleWaffeGame2().checkType(transformNode.pileCards).toInt();
-        //if the pile is anything other than a straight, ignore. Groups handled later
-        if (type == 5 || type == 10) {
+        if (type == 5 || type == 10) { //if the pile is anything other than a straight, ignore. Groups are handled later
             transformNode.depth--;
-            //decrease node depth to the original node's value before continuing
             continueStraight(transformNode, rv,
                     transformNode.getNodePlayingCards(),
                     Util.getValueListArray(transformNode.getNodePlayingCards()),
@@ -205,15 +222,13 @@ public class SuccessorFinderWaffeGame2 {
     }
 
     private static void continueStraight(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues) {
-        //perfect straights
-        if (pileCards.size() % 13 == 0) {
+        
+        if (pileCards.size() % 13 == 0) {//perfect straights
             addAllStraights(node, rv, cards, cardsValues);
             return;
         }
 
-        //find both ends, check cards for values
         int lookForCount = 1 + pileCards.size() / 13;
-
         int downValue = -1;
         int upValue = -1;
         boolean skipFirst = true;
@@ -278,16 +293,18 @@ public class SuccessorFinderWaffeGame2 {
         }
     }
 
+    /**
+     * Checks whether or not you can transform a suit or straight combination into groups
+     */
     private static void groupTransform(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues, int groupSize) {
         Collection<Card> transformCards = new WaffeList();
 
-        //Make transform node
         for (int j = 1; j < pileValues.length; j++) {
             if (pileValues[j].size() == groupSize - 1) {
                 if (cardsValues[j].isEmpty()) {
                     return;
                 } else {
-                    transformCards.add(cardsValues[j].get(0)); //this choise could be improved
+                    transformCards.add(cardsValues[j].get(0)); //Improve this later
                 }
             } else if (pileValues[j].size() > groupSize - 1) {
                 return;
@@ -300,7 +317,7 @@ public class SuccessorFinderWaffeGame2 {
         MinimaxNode transformNode = createNewSuccessor(node, transformCards);
 
         rv.add(transformNode);
-        //decrease node depth to the original node's value
+        
         transformNode.depth--;
         continueGroups(transformNode, rv,
                 transformNode.getNodePlayingCards(),
@@ -315,7 +332,6 @@ public class SuccessorFinderWaffeGame2 {
                     Util.getValueListArray(transformNode.pileCards), groupSize + 1);
         }
         transformNode.depth++;
-        //note that this method leaves children to the original node with same depth value.
     }
 
     private static void continueGroups(MinimaxNode node, List<MinimaxNode> rv, Collection<Card> cards, List<Card>[] cardsValues, Collection<Card> pileCards, List<Card>[] pileValues, int groupSize) {
@@ -423,24 +439,16 @@ public class SuccessorFinderWaffeGame2 {
     private static boolean transferCards(Collection<Card> play, Collection<Card> from, Collection<Card> to) {
         for (Card card : play) {
             if (!from.remove(card)) {
-                Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Tried transferring card that didn't belong to Collection!"));
+                System.out.println("WARNING! Tried transferring card that didn't belong to Collection!");
                 return false;
             } else {
                 if (!to.add(card)) {
-                    Logger.getLogger(MinimaxTreeWaffeGame2.class.getName()).log(Level.SEVERE, null, new Exception("Tried adding a card to a Collection which already contains it!"));
+                    System.out.println("WARNING! Tried adding a card to a Collection which already contains it!");
                     from.add(card);
                     return false;
                 }
             }
         }
         return true;
-    }
-
-    private static boolean checkSum(Collection<Card> cards, List<Card>[] cardsValues) {
-        int sum = 0;
-        for (int i = 0; i < cardsValues.length; i++) {
-            sum += cardsValues[i].size();
-        }
-        return (sum != cards.size());
     }
 }

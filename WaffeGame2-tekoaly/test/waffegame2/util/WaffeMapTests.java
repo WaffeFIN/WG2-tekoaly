@@ -160,10 +160,10 @@ public class WaffeMapTests {
 
         //WARMUP
         for (int j = 0; j < 3; j++) {
-            bigPutTestInit(testSize, hashMap);
-            hashMap.clear();
+            bigPutTestInit(testSize, map);
+            map.clear();
         }
-        //Actual test
+        
         l1 = System.nanoTime();
         for (int j = 0; j < 3; j++) {
             bigPutTestInit(testSize, hashMap);
@@ -179,14 +179,9 @@ public class WaffeMapTests {
         l3 = System.nanoTime();
         System.out.println(".put HashMap performance:  " + (l2 - l1) / 1000 + "\n.put WaffeMap performance: " + (l3 - l2) / 1000);
         System.out.println("");
-        //WARMUP
-        for (int j = 0; j < 3; j++) {
-            bigPutTestInit(testSize, hashMap);
-            hashMap.clear();
-        }
+
         bigPutTestInit(testSize, hashMap);
         bigPutTestInit(testSize, map);
-        //Actual test
         l1 = System.nanoTime();
         for (int j = 0; j < 3; j++) {
             bigGetTest(testSize, hashMap);

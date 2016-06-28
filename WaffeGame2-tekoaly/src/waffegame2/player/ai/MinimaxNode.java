@@ -5,7 +5,6 @@
  */
 package waffegame2.player.ai;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +34,6 @@ public class MinimaxNode {
         this.maxCards = maxCards;
         this.minCards = minCards;
         this.pileCards = pileCards;
-        this.successors = new ArrayList();
     }
 
     public MinimaxNode() {
@@ -46,7 +44,16 @@ public class MinimaxNode {
         return (depth % 2 == 1);
     }
 
+    /**
+     * Returns whether or not the node has successors. Note that the node can
+     * still have a bestSuccessor
+     *
+     * @return true if the node has not got any successors
+     */
     public boolean isLeafNode() {
+        if (successors == null) {
+            return true;
+        }
         return successors.isEmpty(); //:D
     }
 

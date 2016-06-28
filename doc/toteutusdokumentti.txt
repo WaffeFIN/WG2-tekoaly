@@ -1,0 +1,108 @@
+	Notaatiota:
+
+	K = korttien lkm
+	C = kombinaatioiden lkm, joka on keskimäärin K^2, korkeintaan 2^K ja vähintään K
+
+
+Ohjelman yleisrakenne sekä saavutetut aika- ja tilavaativuudet (m.m. O-analyysit pseudokoodista)
+
+	Mainissa käyttöliittymä
+	Tekoäly generoi itselleen minimaxpuun:
+		Minimaxpuu alustaa ensin "StateConverter"-mapin, jonka avulla muutetaan pelissä olevat kortit longiksi. Long-arvoa käytetään seuraavassa mapissa
+		Minimaxpuu käyttää myös toista mappia, nimeltä NodeMap. Tämän avulla StateConverteristä saatu longin avulla saadan selville solmu,
+		joka on samanlaisessa tilanteessa kuin toinen solmu.
+		Eli toisin sanoin, StateConverterin ja NodeMapin avulla löydetään nopeasti [O(K), missä K on korttien lkm] samanlaisia solmuja.
+		Näiden alustettua aloitetaan minimax:
+			Minimaxin alussa katsotaan, onko solmu voittanut pelin. Tämä tarkistetaan kokeilemalla lisätä solmun kortit pöytään.
+			Jos pöytäkortteien ja solmukorttien yhdestelmä on validi, solmu on voittanut. Korttikokoelman validisuustarkistus suorittuu ajassa O(K + c).
+			Jos solmu ei voita, tarkistetaan seuraavaksi NodeMapistä löytyykö samanlaisia solmuja. (metodi addPreExistingSuccessors)
+				addPreExistingSuccessors laskee ensin pelitilanteen long-muotoon. Tapahtuu ajassa O(K). Huomiotavaa on se,
+				että meitä kiinnostaa vain omien korttejen sekä pöydällä olevien korttien tallentaminen NodeMappiin. Tämä selitetään kohta.
+				Jos NodeMapistä löytyy samanlainen sisarsolmu, tarkistetaan jos se on identtinen solmun kanssa.
+				Jos se on identtinen, voimme lopettaa solmun minimax metodi palauttamalla sisarsolmun arvon.
+				Jos NodeMapistä löytyy samanlainen sisarsolmu joka ei ole identtinen solmun kanssa,
+				tiedämme että solmun kortit ja pöytäkortit ovat identtiset, mutta vastustajan kortit voi vaihdella.
+				Tämänlaiset solmut ovat kuitenkin meille hyödyksi, sillä saadaan nopeasti laskettua solmun seuraajat sisarsolmusta.
+					Tarkistetaan sisarsolmun seuraajat:
+					
+								Solmu				Sisarsolmu
+					Kortit		A					A
+					V.Kortit	B					D
+					Pöytä K.	C					C
+					
+								Lapsi				Sisarenlapsi
+					Kortit		X					X
+					V.Kortit	B					D
+					Pöytä K.	Z					Z
+					
+					Taulukko esittää solmun ja sisarsolmun kortteja.
+					
+					Nähdään, että jos yhdistetään solmun vastustajan kortit sekä sisarenlapsen kortit ja pöytäkortit, luodaan solmulle sen lapsi.
+					Ennen lapsen luomista tarkistetaan vielä NodeMapistä jos sieltä löytyisi identtinen lapsi.
+					Sisarenlapsien avulla karsitaan noin 40% kaikkien seuraajien laskemisesta. Toimii lineaarisessa ajassa sisarlapsista riippuen.
+				Jos NodeMapistä ei löydy sisarsolmua, lisätään solmu NodeMappiin ja jatketaan minimax:ia.
+			Takaisin minimaxissa. Tässä vaiheessa, jos solmu ei voita, eikä löytynyt identtistä sisarsolmua, voidaan arvioida solmun pistemäärä,
+			jos ohjelman rajoitus tulee vastaan. [1]
+			Lasketaan seuraajat, jos niitä ei lisätty addPreExistingSuccessorsissa [2]. Tämän aikavaatimusta en saannut tarkalleen arvoitua.
+			Metodi on suuremmaksi osaksi O(K + C), koska kortteja iteroidaan monenkertaisesti (muttei ikinä sisäkkäin) ja jokaista kombinaatiota
+			kohtaan luodaan uusi solmu. Joitakin O(K^2) ja O(2^K) metodejakin löytyy, mutta niiden aikavaatimus on kuitenkin pienempi.
+			Seuraajien lukumäärä on rajoitettu 200:aan.
+			Jokaista seuraaja kohti lasketaan sen arvo minimaxilla
+				Koska minimax puussa valitaan aina vuorotellen paras/huonoin vaihtoehto, voimme alfa-beeta karsinnalla päättää minimaxin
+				ennen kaikkien seuraajien arvojen laskemista.
+				Tämä johtuu siitä, kun löydetään solmu jonka arvo on sen verran hyvä, että se päihittää solmun edeltäjän arvon,
+				edeltäjä tulee aina valita jonkun muun solmun (koska edeltäjä haluaa huonoimman solmun).
+			Tähän loppuu minimax
+		Puun generoitua saadaan puun juuresta paras lyöntivaihtoehto. Lisäksi NodeMapistä voimme löytää (muttei aina) seuraavankin lyönnin.
+		
+	[1] Arviointi
+		Laskin korttikokoelman pistämäärän melko naivisesti käyttämällä "hyökkäyspisteitä" ja "puolustuspisteitä".
+			Hyökkäyspisteiden kaava on seuraava: Summaa suurimpien kombinaatioiden neliöt ja jaa se korttien lukumäärän neliöllä.
+			Tällöin jos on isoja kombinaatioita kädessä saa paljon pisteitä.
+			Puolustuspisteet lasketaan seuraavasti: Ota korttien arvojen lukumäärä kertaa värijakauma + suoranmuunnos bonus
+			Tämä ei kuitenkaan ota huomioon ryhmiä, joten sitä voisi vielä viilata.
+			Ideana kuitenin on se, että korteilla on vaikeampaa puolustaa jos on jokin heikkous. Siksi, jos on joko huonosti arvoja tai maata kädessä saa vähemmän puolustuspisteitä.
+		Huomattavaa on myös se, että jos vastustaja voittaa seuraavalla lyönnillään, pisteitä vähennetään rajusti.
+
+	[2] Seuraajien luonti:
+		Seuraajia voi olla seuraavanlaisia:
+			Yksinäisiä kortteja
+			Maata
+			Suoraa
+			Ryhmiä
+			Maan muuttaminen suoraksi
+			Lyhyen suoran muuttamisen ryhmiksi
+			Ryhmien muuttaminen suuremmiksi
+			Ryhmien muuttaminen isoksi, sykliseksi suoraksi
+		Näistä voisi vielä jatkaa pari sivua, mutta lyhennän sen toimintaa tässä. Kaikilla metodeilla on sama periaate, etsitään tietynlaista seuraajaa ja jos sellainen löytyy, rakennetaan sen avulla lisää seuraajia. Esimerkiksi jos saadaan maa muutettua pareiksi, jatketaan parien lisäämistä uusiin seuraajiin.
+		Kun kaikki seuraajat on laskettu, järjestetään ne suuruusjärjestykseen niin, että ensin tulevat ne solmut, jossa löimme isoimman kombinaation. Tämä parantaa algoritmia huomattavasti.
+		
+	Algoritmin aikavaatimusta on vaikea arvioida. Minimax metodissa luodaan tyhjälle kentälle C uutta solmua, ja epätyhjälle pöydälle 1..C solmua. Voimme arvioida aikavaativuuden exponentiaaliseksi korttien määrän suhteen. Huomataan myös käytännössä korttien lisätessä, että aikavaatimus nousee hyvin nopeasti.
+	Tilavaatimus on karkeasti solmujen määrä sekä NodeMapin taulukon koko. Tämä kasvaa exponentiaalisesti aikavaatimuksen kanssa.
+	
+	Empiirisesti huomataan, että aikavaatimus on noin O(1.7^K)
+
+Työn mahdolliset puutteet ja parannusehdotukset
+
+	Kombinaatioiden määrää voisi pienentää joukoilla, missä kaikki maat ja korttikokoelmien luomat suorat olisivat omissa joukoissan yms.
+	Tämän avulla kombinaatioiden kelvollisuus voisi tarkistaa enemmän "analyyttisesti", ja ehkä tuottaa paljon nopeamman algoritmin.
+	Idea tuli kuitenkin sen verran myöhään, etten olisi ehtinyt sen toteuttamista, mikäli se toimisi.
+
+	Pelitilanteen nopea arviointi voisi myös parantaa. Testattuani arvioinnin oikeellisuutta, karkea arviointi tuottaa
+	vähän yli 50%:sesti oikean tuloksen. Mutta, arviointi algoritmissa on huomattavasti parempi ja tuottaa
+	melko usein (~75%) oikean arvion. Tämä ei kuitenkaan ole kovin tarkkaa.
+	
+	Alkupelin tekoäly puuttuu vielä, jonka takia peliä ei voi pelata alusta asti tekoälyä vastaan. Alussa oli aikomus vielä luoda alkupelillekin
+	tekoäly, mutta loppupeli tekoälyä luodessa huomasin aika nopeasti, ettei niin tule käymään.
+
+Lähteet
+	https://www.cs.cornell.edu/courses/cs312/2002sp/lectures/rec21.htm
+	Javan omat tietorakenteet, mm. ArrayList, HashSet, HashMap, AbstractCollection sekä AbstractList.
+	StackExchange ongelmien vastaantultua.
+	
+	
+	
+	
+	
+	
+	

@@ -7,9 +7,11 @@ package waffegame2.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 /**
+ * Note that the JavaDoc pre-exists in Set interface
  *
  * @author Walter
  */
@@ -123,8 +125,30 @@ public class WaffeSet<E> implements Set<E> {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Dummy class used for the map
+     */
     private static class Dummy {
         public Dummy() {
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + Objects.hashCode(this.map);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final WaffeSet<?> other = (WaffeSet<?>) obj;
+        return (other.size() == this.size() && other.containsAll(this) && this.containsAll(other));
     }
 }

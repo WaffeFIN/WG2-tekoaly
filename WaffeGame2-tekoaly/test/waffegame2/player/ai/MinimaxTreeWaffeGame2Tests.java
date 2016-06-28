@@ -242,40 +242,4 @@ public class MinimaxTreeWaffeGame2Tests {
 
         assertEquals(Integer.MAX_VALUE, tree.root.value);
     }
-
-//    @Test
-//    public void treeGenerationTestProblem2() {
-//        pileCards.add(new Card(Card.Value.TWO, Card.Suit.DIAMONDS));
-//        pileCards.add(new Card(Card.Value.THREE, Card.Suit.SPADES));
-//        myCards.add(new Card(Card.Value.ACE, Card.Suit.HEARTS));
-//        myCards.add(new Card(Card.Value.FOUR, Card.Suit.SPADES));
-//        myCards.add(new Card(Card.Value.SEVEN, Card.Suit.CLUBS));
-//        myCards.add(new Card(Card.Value.TEN, Card.Suit.DIAMONDS));
-//        othersCards.add(new Card(Card.Value.TWO, Card.Suit.CLUBS));
-//        othersCards.add(new Card(Card.Value.FIVE, Card.Suit.CLUBS));
-//        othersCards.add(new Card(Card.Value.JACK, Card.Suit.SPADES));
-//
-//        tree.generateTree(myCards, othersCards, null);
-//
-//        assertEquals(Integer.MAX_VALUE, tree.root.value);
-//        /*
-//        Winning line:
-//        HA S4
-//        C5
-//        
-//        2C
-//        7C
-//        
-//        10D Win
-//        */
-//    }
-    @Test
-    public void roughScoreEstimationTest() {
-//        tree.estimateScore(null, null, null);
-    }
-
-    @Test
-    public void findMoveTest() {
-//        tree.findBestMove(null, null, null, true)
-    }
 }

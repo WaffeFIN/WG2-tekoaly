@@ -18,6 +18,7 @@ import waffegame2.card.Card;
  * @since 2016-01-09
  */
 public class Util {
+
     /**
      * Returns whether a String is in an integer form.
      *
@@ -43,11 +44,11 @@ public class Util {
         return n * n;
     }
 
-    
     /**
-     * Note that jokers are included in index 0!
+     * Returns an array of card lists, each containing cards from only one
+     * value. Note that jokers are included in index 0!
      */
-    public static List<Card>[] getValueListArray(Collection<Card> cards) {        
+    public static List<Card>[] getValueListArray(Collection<Card> cards) {
         List<Card>[] rv = new List[Card.Value.max() + 1];
         for (int i = 0; i < rv.length; i++) {
             rv[i] = new ArrayList();
@@ -57,9 +58,9 @@ public class Util {
         }
         return rv; //:D
     }
-    
-    
+
     /**
+     * Returns an array of card lists, each containing cards from only one suit.
      * Note that jokers are included in index 0!
      */
     public static List<Card>[] getSuitListArray(Collection<Card> cards) {

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import waffegame2.card.Card;
+import waffegame2.util.WaffeList;
 
 /**
  *
@@ -30,15 +31,13 @@ public class MinimaxNodeTests {
         dummyCard = new Card(Card.Value.JOKER, Card.Suit.JOKER);
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
     @Test
     public void isLeafNodeTest() {
-        node.successors.clear();
-        assertTrue("", !node.successors.isEmpty() ^ node.isLeafNode());
+        assertTrue("", node.isLeafNode());
+        node.successors = new WaffeList();
+        assertTrue("", node.isLeafNode());
         node.successors.add(new MinimaxNode());
-        assertTrue("", !node.successors.isEmpty() ^ node.isLeafNode());
+        assertTrue("", !node.isLeafNode());
     }
 
     @Test

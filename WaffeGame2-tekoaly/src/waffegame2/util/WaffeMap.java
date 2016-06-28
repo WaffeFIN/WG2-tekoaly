@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *
+ * Note that the JavaDoc pre-exists in Map interface
+ * 
  * @author Walter
  */
 public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
@@ -41,6 +42,9 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         this.loadingFactor = loadingFactor;
     }
 
+    /**
+     * Resizes the array larger. All entries are recalculated.
+     */
     private void resize() {
         WaffeEntry<K, V>[] oldArray = array;
         array = (WaffeEntry<K, V>[]) new WaffeEntry[oldArray.length * 3];
@@ -103,6 +107,9 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         return hash(key.hashCode());
     }
 
+    /**
+     * Generates the index used for the hash table from the hash
+     */
     private int hash(int h) {
         h = h ^ (h >>> 16);
         h = h % array.length;
@@ -162,10 +169,16 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         }
     }
 
+    /**
+     * Returns an iterator for the keySet. Use this instead of keySet()!
+     */
     public Iterator<K> keyIterator() {
         return new keyIterator();
     }
 
+    /**
+     * Returns an iterator for the values. Use this instead of values()!
+     */
     public Iterator<V> valueIterator() {
         return new valueIterator();
     }
@@ -207,6 +220,9 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * A custom entry used by the hashtable. Necessary for the next value
+     */
     public static class WaffeEntry<K, V> implements Entry<K, V> {
 
         K key;
@@ -252,6 +268,9 @@ public class WaffeMap<K, V> implements Map<K, V> {//extends AbstractMap<K, V>
         }
     }
 
+    /**
+     * Used by both key and value iterators
+     */
     abstract class abstractIterator {
 
         int index;

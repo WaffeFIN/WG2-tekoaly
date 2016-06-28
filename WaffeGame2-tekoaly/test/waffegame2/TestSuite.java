@@ -15,15 +15,12 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     waffegame2.card.CardTests.class,
-    waffegame2.cardOwner.CardOwnerTests.class,
-    waffegame2.cardOwner.HandTests.class,
-    waffegame2.cardOwner.PackTests.class,
-    waffegame2.cardOwner.PileTypeTests.class,
-    waffegame2.cardOwner.CardCollectionTests.class,
-    waffegame2.cardOwner.HandAccessibilityTests.class,
-    waffegame2.cardOwner.pileRules.PileRuleWaffeGame2Tests.class,
-    waffegame2.player.PlayerTests.class,
-    waffegame2.util.UtilTests.class
+    waffegame2.player.ai.MinimaxTreeWaffeGame2Tests.class,
+    waffegame2.player.ai.MinimaxNodeTests.class,
+    waffegame2.util.UtilTests.class,
+    waffegame2.util.WaffeListTests.class,
+    waffegame2.util.WaffeMapTests.class,
+    waffegame2.util.WaffeSetTests.class
 })
 public class TestSuite {
 
