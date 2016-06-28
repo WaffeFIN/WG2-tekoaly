@@ -1,0 +1,1 @@
+java -jar WaffeGame2-tekoaly.jar
