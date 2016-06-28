@@ -1,26 +1,26 @@
-Mit‰ on testattu, miten t‰m‰ tehtiin
+Mit√§ on testattu, miten t√§m√§ tehtiin
 
-	Algoritmin oikeillisuutta pienemmill‰ testeill‰, sek‰ tehokkuutta suuremmilla. Oikeellisuutta on vaikea tarkistaa k‰sin suurilla syˆtteill‰.
+	Algoritmin oikeillisuutta pienemmill√§ testeill√§, sek√§ tehokkuutta suuremmilla. Oikeellisuutta on vaikea tarkistaa k√§sin suurilla sy√∂tteill√§.
 
-Mink‰laisilla syˆtteill‰ testaus tehtiin (vertailupainotteisissa tˆiss‰ t‰rke‰‰)
+Mink√§laisilla sy√∂tteill√§ testaus tehtiin (vertailupainotteisissa t√∂iss√§ t√§rke√§√§)
 
-	Suurin osa testauksesta tehtiin joko t‰ysin satunnaisilla korttivalikoimilla tai sitten k‰ytt‰en valmiita kortti joukkoja.
+	Suurin osa testauksesta tehtiin joko t√§ysin satunnaisilla korttivalikoimilla tai sitten k√§ytt√§en valmiita kortti joukkoja.
 	Erityistilanteita tarkistin manuaalisesti.
 
 Miten testit voidaan toistaa
 
-	Testit ovat JUnit testej‰. Suorituskykytestin voi suorittaa k‰ynnist‰m‰ll‰ ohjelma ja valitsemalla Big test
+	Testit ovat JUnit testej√§. Suorituskykytestin voi suorittaa k√§ynnist√§m√§ll√§ ohjelma ja valitsemalla Big test
 
-Ohjelman toiminnan empiirisen testauksen tulosten esitt‰minen graafisessa muodossa.
+Ohjelman toiminnan empiirisen testauksen tulosten esitt√§minen graafisessa muodossa.
 
-	Alla on taulukko, miss‰ eri parametreill‰ on suoritettu metodi estimationTestSetBig
-	T‰t‰ metodia olen k‰ytt‰nyt perustestin‰.
-	T‰ss‰ analysoidaan kaikkien 90 eri nelj‰n korttijoukon peli‰.
+	Alla on taulukko, miss√§ eri parametreill√§ on suoritettu metodi estimationTestSetBig
+	T√§t√§ metodia olen k√§ytt√§nyt perustestin√§.
+	T√§ss√§ analysoidaan kaikkien 90 eri nelj√§n korttijoukon peli√§.
 	
-	Taulukon vasemmalla puolella on merkitty 'softLimit / maxSuccessors'. MaxSuccessors rajaa nimen mukaan seuraajien m‰‰r‰‰.
-	Sarakkeet W, L ja U tarkoittavat voittojen, h‰viˆiden ja m‰‰rittelem‰ttˆmien pelien m‰‰ri‰.
+	Taulukon vasemmalla puolella on merkitty 'softLimit / maxSuccessors'. MaxSuccessors rajaa nimen mukaan seuraajien m√§√§r√§√§.
+	Sarakkeet W, L ja U tarkoittavat voittojen, h√§vi√∂iden ja m√§√§rittelem√§tt√∂mien pelien m√§√§ri√§.
 	
-				Time	|	W	L	U
+			Time	|	W	L	U
 	40K/16		0:06	|	4	0	86
 	40K/70		0:07	|	9	0	81
 	40K/200		0:08	|	12	0	78
@@ -34,26 +34,26 @@ Ohjelman toiminnan empiirisen testauksen tulosten esitt‰minen graafisessa muodos
 	4M/200		3:15	|	55	0	35
 	4M/200		3:39	|	64	0	26		Omilla tietorakenteilla
 		
-	10M/200		8:58	|	61	1	28		T‰ss‰ j‰rjestettiin seuraajat k‰‰netisess‰ j‰rjestyksess‰
-	10M/200		6:44	|	66	2	22		T‰m‰ testi suoritettiin ennen kuin poistettiin turhat seuraajasolmut niiden arvojen laskemisen j‰lkeen
-	10M/200		5:02	|	68	2	20		T‰ss‰ ei j‰rjestetty seuraajia ollenkaan
+	10M/200		8:58	|	61	1	28		T√§ss√§ j√§rjestettiin seuraajat k√§√§netisess√§ j√§rjestyksess√§
+	10M/200		6:44	|	66	2	22		T√§m√§ testi suoritettiin ennen kuin poistettiin turhat seuraajasolmut niiden arvojen laskemisen j√§lkeen
+	10M/200		5:02	|	68	2	20		T√§ss√§ ei j√§rjestetty seuraajia ollenkaan
 	10M/200		5:16	|	77	3	10		
 	10M/200		7:47	|	73	2	15		Omilla tietorakenteilla
 
-	40M/200		N/A		|					Kaatui muistin loppuessa
-	40M/200		N/A		|					Omilla tietorakenteilla. Kaatui muistin loppuessa
-	40M/200		N/A		|	78	7	5		T‰ss‰ on paras mahdollinen tulos lis‰‰m‰tt‰ muistia. Laskettu osissa.
+	40M/200		N/A	|					Kaatui muistin loppuessa
+	40M/200		N/A	|					Omilla tietorakenteilla. Kaatui muistin loppuessa
+	40M/200		N/A	|	78	7	5		T√§ss√§ on paras mahdollinen tulos lis√§√§m√§tt√§ muistia. Laskettu osissa.
 	
-	Taulukosta huomaamme, ett‰ softLimitill‰ on suora yhteys aikavaatimukseen. 
+	Taulukosta huomaamme, ett√§ softLimitill√§ on suora yhteys aikavaatimukseen. 
 	
-	Seuraavaksi analysoidaan satunnaisten N ja N + 1 kokosien k‰sien peli‰ (eli yhteens‰ 2N + 1 korttia). Taulukosta n‰hd‰‰n, miten ohjelman aikavaatimus kasvaa.
-	Jokaista N kohti laskettiin 1000 peli‰, softLimit = 4000000 ja maxSuccessors = 200.
-	Ennen testej‰ suoritin estimationTestSetBig:in, ettei ensimm‰iset testit hidastu. 
+	Seuraavaksi analysoidaan satunnaisten N ja N + 1 kokosien k√§sien peli√§ (eli yhteens√§ 2N + 1 korttia). Taulukosta n√§hd√§√§n, miten ohjelman aikavaatimus kasvaa.
+	Jokaista N kohti laskettiin 1000 peli√§, softLimit = 4000000 ja maxSuccessors = 200.
+	Ennen testej√§ suoritin estimationTestSetBig:in, ettei ensimm√§iset testit hidastu. 
 	
-			__________________________________________________________________________________________
-	N		|	 2		 3		 4		 5		 6		 7		 8		 9		 10		 11		 12
+		__________________________________________________________________________________________
+	N	|	 2	 3	 4	 5	 6	 7	 8	 9	 10	 11	 12
 	Aika(s)	|	0.043	0.086	0.279	0.491	1.535	4.647	14.83	48.28	165.6	644.0	1708
-	Voitot	|	688		754		631		606		555		546		477		467		475		437		441
+	Voitot	|	688	754	631	606	555	546	477	467	475	437	441
 	
 	Aikavaatimus ~ O(3^N)
 	
