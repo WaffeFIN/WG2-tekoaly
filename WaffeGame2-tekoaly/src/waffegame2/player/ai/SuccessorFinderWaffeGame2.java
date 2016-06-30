@@ -107,10 +107,11 @@ public class SuccessorFinderWaffeGame2 {
             return rv;
         }
         if (rv.size() > maxSuccessors) {
-            Collections.shuffle(rv);
+            Util.shuffleNodes(rv);
             rv = rv.subList(0, maxSuccessors);
         }
-        Collections.sort(rv, new MinimaxNodePlayComparator());
+        Util.sortNodes(rv, new MinimaxNodePlayComparator());
+        
         return rv;
     }
 

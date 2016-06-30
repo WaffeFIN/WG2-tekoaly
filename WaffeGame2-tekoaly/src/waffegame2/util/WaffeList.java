@@ -25,12 +25,13 @@ public class WaffeList<E> extends AbstractList<E> implements List<E> {
     }
 
     public WaffeList(int initialSize) {
-        if (initialSize < minimumCapacity)
+        if (initialSize < minimumCapacity) {
             initialSize = minimumCapacity;
+        }
         array = new Object[initialSize];
         size = 0;
     }
-    
+
     public WaffeList(Collection<? extends E> c) {
         this(c.size());
         addAll(c);
@@ -46,12 +47,12 @@ public class WaffeList<E> extends AbstractList<E> implements List<E> {
 
     @Override
     public int size() {
-        return size; 
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return size == 0; 
+        return size == 0;
     }
 
     @Override
@@ -109,6 +110,31 @@ public class WaffeList<E> extends AbstractList<E> implements List<E> {
         E e = (E) array[i];
         array[i] = element;
         return e;
+    }
+
+    @Override
+    public Object[] toArray() {
+        Object[] rv = new Object[size];
+        for (int i = 0; i < size; i++) {
+            rv[i] = array[i];
+        }
+        return rv;
+    }
+
+    @Override
+    public List<E> subList(int from, int to) {
+        if (from > to) {
+            int temp = to;
+            to = from;
+            from = temp;
+        }
+        rangeCheck(from);
+        rangeCheck(to - 1);
+        WaffeList<E> rv = new WaffeList(to - from);
+        for (int i = from; i < to; i++) {
+            rv.add(get(i));
+        }
+        return rv;
     }
 
     private void increaseArray() {

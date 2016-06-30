@@ -18,11 +18,13 @@ import org.junit.Test;
  */
 public class WaffeListTests {
 
-    private class Dummy {}
+    private class Dummy {
+    }
 
     List<Dummy> list;
 
-    public WaffeListTests() {}
+    public WaffeListTests() {
+    }
 
     @Before
     public void setUp() {
@@ -123,7 +125,7 @@ public class WaffeListTests {
             n++;
         }
         assertEquals(n, list.size());
-        
+
         List<Dummy> list2 = new WaffeList();
         for (int i = 0; i < 10; i++) {
             list2.add(new Dummy());
@@ -142,4 +144,56 @@ public class WaffeListTests {
             list.clear();
         }
     }
+
+    @Test
+    public void testToArray() {
+        Dummy d = new Dummy();
+        list.add(d);
+        for (int i = 0; i < 9; i++) {
+            list.add(new Dummy());
+        }
+        list.add(d);
+        for (int i = 0; i < 9; i++) {
+            list.add(new Dummy());
+        }
+        Object[] array = list.toArray();
+        assertEquals(20, array.length);
+        assertEquals(d, array[0]);
+        assertEquals(d, array[10]);
+    }
+
+    @Test
+    public void testSubList() {
+        Dummy d = new Dummy();
+        list.add(d);
+        for (int i = 0; i < 4; i++) {
+            list.add(new Dummy());
+        }
+        list.add(d);
+        for (int i = 0; i < 9; i++) {
+            list.add(new Dummy());
+        }
+        list.add(d);
+        for (int i = 0; i < 14; i++) {
+            list.add(new Dummy());
+        }
+        List<Dummy> sl1 = list.subList(0, 5);
+        List<Dummy> sl2 = list.subList(0, 15);
+        List<Dummy> sl3 = list.subList(5, list.size());
+
+        assertEquals(15, sl2.size());
+        for (int i = 0; i < sl1.size(); i++) {
+            assertEquals(list.get(i), sl1.get(i));
+        }
+
+        for (int i = 0; i < sl2.size(); i++) {
+            assertEquals(list.get(i), sl2.get(i));
+        }
+
+        for (int i = 5; i < list.size(); i++) {
+            assertEquals(list.get(i), sl3.get(i - 5));
+        }
+        assertEquals(d, sl3.get(0));
+    }
+
 }

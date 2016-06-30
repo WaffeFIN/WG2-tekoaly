@@ -1,1 +1,1 @@
-java -jar WaffeGame2-tekoaly.jar
+java -Xmx1536M -Xms1024M -jar WaffeGame2-tekoaly.jar
